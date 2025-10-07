@@ -8,6 +8,7 @@
     "esbenp.prettier-vscode",
     "natqe.reload",
     "heartacker.better-extend-keybindings",
-    "github.copilot-chat"
+    "github.copilot-chat",
+    "formulahendry.auto-rename-tag"
   ]
 }
