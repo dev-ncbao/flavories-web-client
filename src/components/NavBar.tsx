@@ -1,4 +1,14 @@
-import { Stack, Tab, tabClasses, TabList, Tabs, Typography } from '@mui/joy';
+import {
+    Autocomplete,
+    Button,
+    Stack,
+    Tab,
+    tabClasses,
+    TabList,
+    Tabs,
+    Typography
+} from '@mui/joy';
+import { CircleUser, Search } from 'lucide-react';
 import { useEffect, useState, type JSX } from 'react';
 import { matchPath, useLocation, useNavigate } from 'react-router';
 
@@ -19,7 +29,7 @@ export default function NavBar(): JSX.Element {
 
     useEffect(() => {
         const path = location.pathname;
-        
+
         if (matchPath('/', path)) {
             setIndex(0);
         } else if (matchPath('/recipe/*', path)) {
@@ -33,8 +43,11 @@ export default function NavBar(): JSX.Element {
     return (
         <Stack
             direction={'row'}
+            justifyContent={'space-between'}
+            alignSelf={'center'}
             spacing={2}
-            padding={2}
+            paddingY={4}
+            width={'100%'}
         >
             <Stack
                 direction={'row'}
@@ -62,16 +75,15 @@ export default function NavBar(): JSX.Element {
                 size="md"
                 sx={{
                     backgroundColor: 'transparent',
-                    height: '72px',
                     justifyContent: 'center'
                 }}
             >
                 <TabList
                     disableUnderline
                     sx={{
-                        height: '40px',
                         justifyContent: 'center',
                         fontWeight: 'lg',
+                        paddingTop: '5px',
                         [`&& .${tabClasses.root}`]: {
                             flex: 'initial',
                             bgcolor: 'transparent',
@@ -99,6 +111,30 @@ export default function NavBar(): JSX.Element {
                     </Tab>
                 </TabList>
             </Tabs>
+            <Stack
+                direction={'row'}
+                alignItems={'center'}
+                spacing={1}
+            >
+                <Autocomplete
+                    freeSolo
+                    placeholder="Saerch..."
+                    options={[]}
+                    startDecorator={<Search />}
+                    sx={{
+                        width: 300,
+                        height: '100%'
+                    }}
+                />
+                <Button
+                    startDecorator={<CircleUser />}
+                    sx={{
+                        height: '100%'
+                    }}
+                >
+                    Sign In
+                </Button>
+            </Stack>
         </Stack>
     );
 }

@@ -24,6 +24,7 @@ export default function App(): JSX.Element {
             direction={'column'}
             height={'inherit'}
             width={'inherit'}
+            paddingX={8}
         >
             {showNavBar && <NavBar />}
             <AppRoutes />

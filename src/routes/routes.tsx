@@ -1,5 +1,5 @@
 import Community from '../pages/Community';
-import LandingPage from '../pages/LandingPage';
+import LandingPage from '../pages/LandingPage/LandingPage';
 import NotFound from '../pages/NotFound';
 import Recipe from '../pages/Recipe';
 
