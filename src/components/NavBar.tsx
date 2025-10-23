@@ -131,6 +131,9 @@ export default function NavBar(): JSX.Element {
                     sx={{
                         height: '100%'
                     }}
+                    onClick={() => {
+                        navigate('/sign-in');
+                    }}
                 >
                     Sign In
                 </Button>

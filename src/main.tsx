@@ -1,10 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
 import '@fontsource-variable/inter';
 import { BrowserRouter } from 'react-router';
 import { CssVarsProvider, CssBaseline, GlobalStyles } from '@mui/joy';
 import { theme } from './theme.ts';
+import AppRoutes from './routes/AppRoutes.tsx';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -28,11 +28,14 @@ createRoot(document.getElementById('root')!).render(
                                 width: 'inherit',
                                 height: 'inherit'
                             }
+                        },
+                        'input::-ms-reveal, input::-ms-clear ': {
+                            display: 'none'
                         }
                     }}
                 />
                 {/* The rest of your application */}
-                <App />
+                <AppRoutes />
             </CssVarsProvider>
         </BrowserRouter>
     </StrictMode>
