@@ -1,5 +1,6 @@
 import {
     Autocomplete,
+    Avatar,
     Button,
     Stack,
     Tab,
@@ -11,11 +12,15 @@ import {
 import { CircleUser, Search } from 'lucide-react';
 import { useEffect, useState, type JSX } from 'react';
 import { matchPath, useLocation, useNavigate } from 'react-router';
+import { userService } from '../services/user/user.service';
+import type { UserDto } from '../services/user/user.dto';
 
 const routes = ['/', '/recipe', '/community'];
 
 export default function NavBar(): JSX.Element {
     const [index, setIndex] = useState(0);
+    const [user, setUser] = useState<UserDto | null>(null);
+    const [loggedIn, setLoggedIn] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -38,6 +43,18 @@ export default function NavBar(): JSX.Element {
             setIndex(2);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (localStorage.getItem('token')) {
+            userService.profile().then((response) => {
+                setUser(response.data);
+            });
+
+            setLoggedIn(true);
+        } else {
+            setLoggedIn(false);
+        }
     }, []);
 
     return (
@@ -114,29 +131,53 @@ export default function NavBar(): JSX.Element {
             <Stack
                 direction={'row'}
                 alignItems={'center'}
-                spacing={1}
+                spacing={loggedIn ? 2 : 1}
             >
                 <Autocomplete
                     freeSolo
-                    placeholder="Saerch..."
+                    placeholder="Search..."
                     options={[]}
-                    startDecorator={<Search />}
+                    startDecorator={<Search />} 
                     sx={{
                         width: 300,
                         height: '100%'
                     }}
                 />
-                <Button
-                    startDecorator={<CircleUser />}
-                    sx={{
-                        height: '100%'
-                    }}
-                    onClick={() => {
-                        navigate('/sign-in');
-                    }}
-                >
-                    Sign In
-                </Button>
+                {!loggedIn ? (
+                    <Button
+                        startDecorator={<CircleUser />}
+                        sx={{
+                            height: '100%'
+                        }}
+                        onClick={() => {
+                            navigate('/sign-in');
+                        }}
+                    >
+                        Sign In
+                    </Button>
+                ) : (
+                    <Stack direction={'row'} alignItems={'center'} spacing={1}>
+                        <Avatar
+                            alt={user?.username}
+                            size="md"
+                            src={user?.avatarUrl}
+                        />
+                        <Stack>
+                            <Typography level="body-md">
+                                {user?.firstName}{' '}
+                                {user?.lastName && ` ${user?.lastName}`}
+                            </Typography>
+                            <Typography
+                                level="body-xs"
+                                sx={{
+                                    color: 'var(--joy-palette-neutral-500)'
+                                }}
+                            >
+                                {user?.username && `@${user?.username}`}
+                            </Typography>
+                        </Stack>
+                    </Stack>
+                )}
             </Stack>
         </Stack>
     );
