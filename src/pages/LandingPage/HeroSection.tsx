@@ -1,7 +1,9 @@
-import { Box, Button, Stack, Typography } from '@mui/joy';
+import { Box, Button, Stack, Typography, useTheme } from '@mui/joy';
 import type { JSX } from 'react';
 
 export default function HeroSection(): JSX.Element {
+    const theme = useTheme();
+
     return (
         <Stack
             direction={'row'}
@@ -9,11 +11,13 @@ export default function HeroSection(): JSX.Element {
             alignSelf={'center'}
             width={'100%'}
             sx={{
-                overflow: 'visible'
+                overflowX: 'visible',
+                paddingInline: 8,
+                scrollbarWidth: 'none'
             }}
         >
-            <Box
-                sx={{
+            <div
+                style={{
                     flexBasis: '50%'
                 }}
             >
@@ -39,12 +43,16 @@ export default function HeroSection(): JSX.Element {
                 <Box height={48}></Box>
                 <Button
                     size="lg"
-                    sx={{ height: 56, paddingX: 4 }}
+                    sx={{
+                        height: 56,
+                        paddingX: 4,
+                        borderRadius: theme.vars.radius.lg
+                    }}
                 >
                     Explore Recipes
                 </Button>
-            </Box>
-            <Box>
+            </div>
+            <div>
                 <img
                     src="/src/assets/hero.png"
                     alt="Delicious food"
@@ -55,7 +63,7 @@ export default function HeroSection(): JSX.Element {
                         zIndex: -1
                     }}
                 />
-            </Box>
+            </div>
         </Stack>
     );
 }

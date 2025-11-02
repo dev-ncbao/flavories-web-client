@@ -7,7 +7,8 @@ import {
     Input,
     Link,
     Stack,
-    Typography
+    Typography,
+    useTheme
 } from '@mui/joy';
 import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import { useState, type JSX } from 'react';
@@ -15,6 +16,7 @@ import { useNavigate } from 'react-router';
 
 export default function SignUp(): JSX.Element {
     const navigate = useNavigate();
+    const theme = useTheme();
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -98,6 +100,9 @@ export default function SignUp(): JSX.Element {
                                         setFirstName(event.target.value)
                                     }
                                     placeholder="Enter your first name"
+                                    sx={{
+                                        borderRadius: theme.vars.radius.md
+                                    }}
                                 />
                             </FormControl>
                             <Box height={16} />
@@ -109,6 +114,9 @@ export default function SignUp(): JSX.Element {
                                         setEmail(event.target.value)
                                     }
                                     placeholder="Enter your email"
+                                    sx={{
+                                        borderRadius: theme.vars.radius.md
+                                    }}
                                 />
                             </FormControl>
                             <Box height={16} />
@@ -160,6 +168,9 @@ export default function SignUp(): JSX.Element {
                                         setPassword(event.target.value)
                                     }
                                     placeholder="Enter your password"
+                                    sx={{
+                                        borderRadius: theme.vars.radius.md
+                                    }}
                                 />
                             </FormControl>
                         </Stack>
@@ -174,6 +185,9 @@ export default function SignUp(): JSX.Element {
                                         setLastName(event.target.value)
                                     }
                                     placeholder="Enter your first name"
+                                    sx={{
+                                        borderRadius: theme.vars.radius.md
+                                    }}
                                 />
                             </FormControl>
                             <Box height={16} />
@@ -185,6 +199,9 @@ export default function SignUp(): JSX.Element {
                                         setUsername(event.target.value)
                                     }
                                     placeholder="Enter your username"
+                                    sx={{
+                                        borderRadius: theme.vars.radius.md
+                                    }}
                                 />
                             </FormControl>
                             <Box height={16} />
@@ -240,6 +257,9 @@ export default function SignUp(): JSX.Element {
                                         setConfirmPassword(event.target.value)
                                     }
                                     placeholder="Enter your password again"
+                                    sx={{
+                                        borderRadius: theme.vars.radius.md
+                                    }}
                                 />
                             </FormControl>
                         </Stack>
@@ -247,7 +267,13 @@ export default function SignUp(): JSX.Element {
                     <Grid xs={12}>
                         <Stack>
                             <Box height={24} />
-                            <Button>Sign Up</Button>
+                            <Button
+                                sx={{
+                                    borderRadius: theme.vars.radius.md
+                                }}
+                            >
+                                Sign Up
+                            </Button>
                             <Box height={20} />
                             <Typography
                                 level="body-sm"

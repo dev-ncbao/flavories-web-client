@@ -8,15 +8,17 @@ import {
     Input,
     Link,
     Stack,
-    Typography
+    Typography,
+    useTheme
 } from '@mui/joy';
 import { ChevronLeft, Eye, EyeOff, OctagonAlert, X } from 'lucide-react';
 import { useState, type JSX } from 'react';
 import { useNavigate } from 'react-router';
-import { authService } from '../../services/auth/auth.service';
+import { authService } from '../../services/Auth/auth.service';
 
 export default function SignIn(): JSX.Element {
     const navigate = useNavigate();
+    const theme = useTheme();
 
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -93,6 +95,9 @@ export default function SignIn(): JSX.Element {
                                 setUsernameOrEmail(event.target.value)
                             }
                             placeholder="Enter your username or email"
+                            sx={{
+                                borderRadius: theme.vars.radius.md
+                            }}
                         />
                     </FormControl>
                     <Box height={16} />
@@ -140,12 +145,18 @@ export default function SignIn(): JSX.Element {
                                 setPassword(event.target.value)
                             }
                             placeholder="Enter your password"
+                            sx={{
+                                borderRadius: theme.vars.radius.md
+                            }}
                         />
                     </FormControl>
                     <Box height={16} />
                     {showError && (
                         <Alert
-                            sx={{ alignItems: 'flex-start' }}
+                            sx={{
+                                alignItems: 'flex-start',
+                                borderRadius: theme.vars.radius.lg
+                            }}
                             startDecorator={<OctagonAlert />}
                             variant="soft"
                             color={'danger'}
@@ -182,6 +193,9 @@ export default function SignIn(): JSX.Element {
                     )}
                     <Box height={24} />
                     <Button
+                        sx={{
+                            borderRadius: theme.vars.radius.md
+                        }}
                         onClick={async () => {
                             await authService
                                 .signIn({ usernameOrEmail, password })

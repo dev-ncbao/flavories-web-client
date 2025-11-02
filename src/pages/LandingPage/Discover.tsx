@@ -1,9 +1,15 @@
-import { Button, Stack, Typography } from '@mui/joy';
+import { Button, Stack, Typography, useTheme } from '@mui/joy';
 import type { JSX } from 'react';
 
 export default function Discover(): JSX.Element {
+    const theme = useTheme();
+
     return (
-        <Stack>
+        <Stack
+            sx={{
+                paddingInline: 8
+            }}
+        >
             <Stack
                 direction={'row'}
                 justifyContent={'space-between'}
@@ -18,7 +24,8 @@ export default function Discover(): JSX.Element {
                     size="md"
                     sx={{
                         height: 40,
-                        paddingX: 3
+                        paddingX: 3,
+                        borderRadius: theme.vars.radius.lg
                     }}
                 >
                     See All
