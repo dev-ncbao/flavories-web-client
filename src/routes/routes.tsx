@@ -4,7 +4,7 @@ import SignUp from '../pages/Authentication/SignUp';
 import Community from '../pages/Community';
 import LandingPage from '../pages/LandingPage/LandingPage';
 import NotFound from '../pages/NotFound';
-import Recipe from '../pages/Recipe';
+import RecipePage from '../pages/Recipe/RecipePage';
 
 export const appRoutes = [
     {
@@ -12,7 +12,7 @@ export const appRoutes = [
         element: <App />,
         children: [
             { index: true, element: <LandingPage /> },
-            { path: 'recipe', element: <Recipe /> },
+            { path: 'recipe', element: <RecipePage /> },
             { path: 'community', element: <Community /> }
         ]
     },

@@ -14,7 +14,7 @@ import {
 import { ChevronLeft, Eye, EyeOff, OctagonAlert, X } from 'lucide-react';
 import { useState, type JSX } from 'react';
 import { useNavigate } from 'react-router';
-import { authService } from '../../services/Auth/auth.service';
+import { authService } from '../../services/auth/auth.service';
 
 export default function SignIn(): JSX.Element {
     const navigate = useNavigate();
