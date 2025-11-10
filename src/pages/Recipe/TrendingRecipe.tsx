@@ -6,12 +6,11 @@ import {
     AspectRatio,
     CardContent,
     Box,
-    Grid,
     Button,
     useTheme,
     Alert
 } from '@mui/joy';
-import { useEffect, useState, useMemo, type JSX } from 'react';
+import { useEffect, useState, useMemo, useRef, type JSX } from 'react';
 import type { RecipeDto } from '../../services/recipe/recipe.dto';
 import { recipeService } from '../../services/recipe/recipe.service';
 import {
@@ -21,15 +20,26 @@ import {
     ThumbsDown,
     Eye,
     MessageSquareText,
-    Calendar
+    Calendar,
+    ChevronLeft,
+    ChevronRight
 } from 'lucide-react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import type { Swiper as SwiperType } from 'swiper';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 export default function TrendingRecipe(): JSX.Element {
     const theme = useTheme();
+    const swiperRef = useRef<SwiperType | null>(null);
 
     const [recipes, setRecipes] = useState<RecipeDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isBeginning, setIsBeginning] = useState(true);
+    const [isEnd, setIsEnd] = useState(false);
 
     const isEmpty = useMemo(
         () => !loading && !error && recipes.length === 0,
@@ -188,17 +198,119 @@ export default function TrendingRecipe(): JSX.Element {
                 )}
 
                 {hasRecipes && (
-                    <Grid
-                        container
-                        spacing={3}
+                    <Box
+                        sx={{
+                            position: 'relative',
+                            paddingLeft: '24px',
+                            paddingRight: '24px',
+                            marginLeft: '-24px',
+                            marginRight: '-24px',
+                            '& .swiper': {
+                                paddingTop: '8px',
+                                paddingBottom: '8px',
+                                marginTop: '-8px',
+                                marginBottom: '-8px'
+                            }
+                        }}
                     >
-                        {recipes.map((recipe, index) => (
-                            <Grid
-                                xs={12}
-                                sm={6}
-                                md={4}
-                                key={recipe.id}
-                            >
+                        {/* Custom Navigation Buttons */}
+                        <Button
+                            variant="solid"
+                            color="primary"
+                            disabled={isBeginning}
+                            onClick={() => swiperRef.current?.slidePrev()}
+                            sx={{
+                                position: 'absolute',
+                                left: 0,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                zIndex: 10,
+                                minWidth: 48,
+                                minHeight: 48,
+                                borderRadius: '50%',
+                                padding: 0,
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                transition: 'all 0.3s ease',
+                                '&:hover:not(:disabled)': {
+                                    transform: 'translateY(-50%) scale(1.05)',
+                                    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)'
+                                },
+                                '&:disabled': {
+                                    backgroundColor: theme.vars.palette.neutral[200],
+                                    color: theme.vars.palette.neutral[400],
+                                    cursor: 'not-allowed',
+                                    boxShadow: 'none',
+                                    '& svg': {
+                                        color: theme.vars.palette.neutral[400]
+                                    }
+                                }
+                            }}
+                        >
+                            <ChevronLeft size={24} />
+                        </Button>
+
+                        <Button
+                            variant="solid"
+                            color="primary"
+                            disabled={isEnd}
+                            onClick={() => swiperRef.current?.slideNext()}
+                            sx={{
+                                position: 'absolute',
+                                right: 0,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                zIndex: 10,
+                                minWidth: 48,
+                                minHeight: 48,
+                                borderRadius: '50%',
+                                padding: 0,
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                transition: 'all 0.3s ease',
+                                '&:hover:not(:disabled)': {
+                                    transform: 'translateY(-50%) scale(1.05)',
+                                    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)'
+                                },
+                                '&:disabled': {
+                                    backgroundColor: theme.vars.palette.neutral[200],
+                                    color: theme.vars.palette.neutral[400],
+                                    cursor: 'not-allowed',
+                                    boxShadow: 'none',
+                                    '& svg': {
+                                        color: theme.vars.palette.neutral[400]
+                                    }
+                                }
+                            }}
+                        >
+                            <ChevronRight size={24} />
+                        </Button>
+
+                        <Swiper
+                            modules={[Navigation, Pagination]}
+                            spaceBetween={24}
+                            slidesPerView={3}
+                            onSwiper={(swiper) => {
+                                swiperRef.current = swiper;
+                                setIsBeginning(swiper.isBeginning);
+                                setIsEnd(swiper.isEnd);
+                            }}
+                            onSlideChange={(swiper) => {
+                                setIsBeginning(swiper.isBeginning);
+                                setIsEnd(swiper.isEnd);
+                            }}
+                            breakpoints={{
+                                0: {
+                                    slidesPerView: 1
+                                },
+                                600: {
+                                    slidesPerView: 2
+                                },
+                                900: {
+                                    slidesPerView: 3
+                                }
+                            }}
+                        >
+                            {recipes.map((recipe, index) => (
+                                <SwiperSlide key={recipe.id}>
                                 <Card
                                     variant="outlined"
                                     sx={{
@@ -446,9 +558,10 @@ export default function TrendingRecipe(): JSX.Element {
                                         </Typography>
                                     </CardContent>
                                 </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                    </Box>
                 )}
             </Stack>
         </Stack>
