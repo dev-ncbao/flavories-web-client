@@ -14,7 +14,15 @@ import {
 import { useEffect, useState, useMemo, type JSX } from 'react';
 import type { RecipeDto } from '../../services/recipe/recipe.dto';
 import { recipeService } from '../../services/recipe/recipe.service';
-import { Info, Star, ThumbsUp, ThumbsDown, Eye } from 'lucide-react';
+import {
+    Info,
+    Star,
+    ThumbsUp,
+    ThumbsDown,
+    Eye,
+    MessageSquareText,
+    Calendar
+} from 'lucide-react';
 
 export default function TrendingRecipe(): JSX.Element {
     const theme = useTheme();
@@ -42,7 +50,7 @@ export default function TrendingRecipe(): JSX.Element {
         const fetchRecipes = async () => {
             try {
                 setLoading(true);
-                const response = await recipeService.getRecipes();
+                const response = await recipeService.getTrendingRecipes(20);
 
                 // Add 0.5 second delay for loading state
                 await new Promise((resolve) => setTimeout(resolve, 500));
@@ -184,7 +192,7 @@ export default function TrendingRecipe(): JSX.Element {
                         container
                         spacing={3}
                     >
-                        {recipes.map((recipe) => (
+                        {recipes.map((recipe, index) => (
                             <Grid
                                 xs={12}
                                 sm={6}
@@ -219,6 +227,88 @@ export default function TrendingRecipe(): JSX.Element {
                                                 alt={recipe.name || 'Recipe'}
                                                 loading="lazy"
                                             />
+
+                                            {/* Trending Rank Badge - Top Left Corner */}
+                                            <Box
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    backgroundColor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.9)`,
+                                                    backdropFilter:
+                                                        'blur(20px) saturate(120%)',
+                                                    WebkitBackdropFilter:
+                                                        'blur(20px) saturate(120%)',
+                                                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                                                    borderRadius: `0 0 ${theme.vars.radius.lg} 0`,
+                                                    padding: '6px 10px',
+                                                    minWidth: 32,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    boxShadow:
+                                                        '0 2px 8px rgba(0, 0, 0, 0.2)'
+                                                }}
+                                            >
+                                                <Typography
+                                                    level="body-sm"
+                                                    sx={{
+                                                        color: 'white',
+                                                        fontWeight: 700,
+                                                        fontSize: '0.875rem',
+                                                        lineHeight: 1
+                                                    }}
+                                                >
+                                                    #{index + 1}
+                                                </Typography>
+                                            </Box>
+
+                                            {/* Date Badge - Top Right */}
+                                            <Box
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 12,
+                                                    right: 12,
+                                                    backgroundColor:
+                                                        'rgba(0, 0, 0, 0.25)',
+                                                    backdropFilter:
+                                                        'blur(20px) saturate(120%)',
+                                                    WebkitBackdropFilter:
+                                                        'blur(20px) saturate(120%)',
+                                                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                                                    borderRadius:
+                                                        theme.vars.radius.md,
+                                                    padding: '4px 8px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 0.5
+                                                }}
+                                            >
+                                                <Calendar
+                                                    size={12}
+                                                    color="white"
+                                                />
+                                                <Typography
+                                                    level="body-xs"
+                                                    sx={{
+                                                        color: 'white',
+                                                        fontWeight: 500
+                                                    }}
+                                                >
+                                                    {recipe.createdAt
+                                                        ? new Date(
+                                                              recipe.createdAt
+                                                          ).toLocaleDateString(
+                                                              'en-US',
+                                                              {
+                                                                  month: 'short',
+                                                                  day: 'numeric',
+                                                                  year: 'numeric'
+                                                              }
+                                                          )
+                                                        : 'Unknown'}
+                                                </Typography>
+                                            </Box>
                                         </AspectRatio>
                                     )}
                                     <CardContent>
@@ -228,7 +318,6 @@ export default function TrendingRecipe(): JSX.Element {
                                         >
                                             {recipe.name || 'Untitled Recipe'}
                                         </Typography>
-
                                         <Stack
                                             direction="row"
                                             spacing={2}
@@ -256,7 +345,9 @@ export default function TrendingRecipe(): JSX.Element {
                                                     level="body-sm"
                                                     fontWeight={600}
                                                 >
-                                                    4.5
+                                                    {recipe.rating?.toFixed(
+                                                        1
+                                                    ) || '0.0'}
                                                 </Typography>
                                             </Stack>
 
@@ -277,7 +368,7 @@ export default function TrendingRecipe(): JSX.Element {
                                                     level="body-sm"
                                                     fontWeight={600}
                                                 >
-                                                    123
+                                                    {recipe.likeCount || 0}
                                                 </Typography>
                                             </Stack>
 
@@ -298,7 +389,7 @@ export default function TrendingRecipe(): JSX.Element {
                                                     level="body-sm"
                                                     fontWeight={600}
                                                 >
-                                                    5
+                                                    {recipe.dislikeCount || 0}
                                                 </Typography>
                                             </Stack>
 
@@ -319,11 +410,31 @@ export default function TrendingRecipe(): JSX.Element {
                                                     level="body-sm"
                                                     fontWeight={600}
                                                 >
-                                                    1.2K
+                                                    {recipe.viewCount || 0}
+                                                </Typography>
+                                            </Stack>
+
+                                            {/* Comment Count */}
+                                            <Stack
+                                                direction="row"
+                                                spacing={0.5}
+                                                alignItems="center"
+                                            >
+                                                <MessageSquareText
+                                                    size={16}
+                                                    color={
+                                                        theme.vars.palette
+                                                            .purple[500]
+                                                    }
+                                                />
+                                                <Typography
+                                                    level="body-sm"
+                                                    fontWeight={600}
+                                                >
+                                                    {recipe.commentCount || 0}
                                                 </Typography>
                                             </Stack>
                                         </Stack>
-
                                         <Typography
                                             level="body-sm"
                                             sx={{

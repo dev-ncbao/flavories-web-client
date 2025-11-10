@@ -3,4 +3,11 @@ export class RecipeDto {
     name?: string;
     description?: string;
     image?: string;
+    rating?: number;
+    likeCount?: number;
+    dislikeCount?: number;
+    viewCount?: number;
+    commentCount?: number;
+    trendingScore?: number;
+    createdAt?: Date;
 }
