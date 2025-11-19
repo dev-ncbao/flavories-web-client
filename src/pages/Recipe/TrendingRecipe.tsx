@@ -100,9 +100,9 @@ export default function TrendingRecipe(): JSX.Element {
                     justifyContent={'space-between'}
                 >
                     <Stack>
-                        <Typography level="h2">What's Trending</Typography>
+                        <Typography level="h2">What's Trending This Month</Typography>
                         <Typography color="neutral">
-                            Check our most popular recipes of this month
+                            Discover this month's hottest recipes loved by our community
                         </Typography>
                     </Stack>
                     <Button
@@ -114,7 +114,7 @@ export default function TrendingRecipe(): JSX.Element {
                             borderRadius: theme.vars.radius.lg
                         }}
                     >
-                        See All
+                        See All Trending Recipes
                     </Button>
                 </Stack>
 
@@ -550,7 +550,12 @@ export default function TrendingRecipe(): JSX.Element {
                                         <Typography
                                             level="body-sm"
                                             sx={{
-                                                color: 'var(--joy-palette-neutral-500)'
+                                                color: 'var(--joy-palette-neutral-500)',
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 3,
+                                                WebkitBoxOrient: 'vertical',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis'
                                             }}
                                         >
                                             {recipe.description ||

@@ -25,6 +25,7 @@ createRoot(document.getElementById('root')!).render(
                                 // 'var(--joy-palette-background-body)',
                                 height: '100vh',
                                 width: '100vw',
+                                boxSizing: 'border-box',
                                 '> div#root': {
                                     width: 'inherit',
                                     height: 'inherit'

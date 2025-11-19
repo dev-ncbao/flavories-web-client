@@ -6,5 +6,13 @@ export const recipeService = {
     getTrendingRecipes: (limit?: number) =>
         axiosClient.get<RecipeDto[]>('/recipes/trending', {
             params: { limit }
+        }),
+    getNewRecipesThisMonth: (limit?: number) =>
+        axiosClient.get<RecipeDto[]>('/recipes/new', {
+            params: { limit }
+        }),
+    getMostPopularRecipes: (limit?: number) =>
+        axiosClient.get<RecipeDto[]>('/recipes/popular', {
+            params: { limit }
         })
 };
