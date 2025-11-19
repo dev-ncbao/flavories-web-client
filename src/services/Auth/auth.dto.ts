@@ -6,3 +6,12 @@ export interface SignInRequest {
 export interface SignInResponse {
     accessToken: string;
 }
+
+export interface SignUpRequest {
+    firstName: string;
+    lastName: string;
+    email: string;
+    username: string;
+    password: string;
+    confirmPassword: string;
+}

@@ -180,6 +180,7 @@ export default function SignIn(): JSX.Element {
                                 >
                                     Error
                                 </Typography>
+                                <Box height={4}></Box>
                                 <Typography
                                     level="body-xs"
                                     sx={{

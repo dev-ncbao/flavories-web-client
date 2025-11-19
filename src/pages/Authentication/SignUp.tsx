@@ -1,22 +1,35 @@
 import {
+    Alert,
     Box,
     Button,
     FormControl,
     FormLabel,
     Grid,
+    IconButton,
     Input,
     Link,
     Stack,
     Typography,
     useTheme
 } from '@mui/joy';
-import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
+import {
+    ChevronLeft,
+    Dot,
+    Eye,
+    EyeOff,
+    OctagonAlert,
+    PartyPopper,
+    X
+} from 'lucide-react';
 import { useState, type JSX } from 'react';
 import { useNavigate } from 'react-router';
+import { authService } from '../../services/auth/auth.service';
+import { useSnackbar } from '../../hooks/useSnackbar';
 
 export default function SignUp(): JSX.Element {
     const navigate = useNavigate();
     const theme = useTheme();
+    const snackbar = useSnackbar();
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -26,6 +39,9 @@ export default function SignUp(): JSX.Element {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const [error, setError] = useState<string[] | string | null>(null);
+    const [showError, setShowError] = useState(false);
 
     return (
         <Stack
@@ -95,6 +111,11 @@ export default function SignUp(): JSX.Element {
                             <FormControl>
                                 <FormLabel>First Name: </FormLabel>
                                 <Input
+                                    slotProps={{
+                                        input: {
+                                            tabIndex: 1
+                                        }
+                                    }}
                                     value={firstName}
                                     onChange={(event) =>
                                         setFirstName(event.target.value)
@@ -109,6 +130,11 @@ export default function SignUp(): JSX.Element {
                             <FormControl>
                                 <FormLabel>Email: </FormLabel>
                                 <Input
+                                    slotProps={{
+                                        input: {
+                                            tabIndex: 3
+                                        }
+                                    }}
                                     value={email}
                                     onChange={(event) =>
                                         setEmail(event.target.value)
@@ -123,6 +149,11 @@ export default function SignUp(): JSX.Element {
                             <FormControl>
                                 <FormLabel>Password: </FormLabel>
                                 <Input
+                                    slotProps={{
+                                        input: {
+                                            tabIndex: 5
+                                        }
+                                    }}
                                     endDecorator={
                                         !showPassword ? (
                                             <Button
@@ -180,6 +211,11 @@ export default function SignUp(): JSX.Element {
                             <FormControl>
                                 <FormLabel>Last Name: </FormLabel>
                                 <Input
+                                    slotProps={{
+                                        input: {
+                                            tabIndex: 2
+                                        }
+                                    }}
                                     value={lastName}
                                     onChange={(event) =>
                                         setLastName(event.target.value)
@@ -194,6 +230,11 @@ export default function SignUp(): JSX.Element {
                             <FormControl>
                                 <FormLabel>Username: </FormLabel>
                                 <Input
+                                    slotProps={{
+                                        input: {
+                                            tabIndex: 4
+                                        }
+                                    }}
                                     value={username}
                                     onChange={(event) =>
                                         setUsername(event.target.value)
@@ -208,6 +249,11 @@ export default function SignUp(): JSX.Element {
                             <FormControl>
                                 <FormLabel>Confirm password: </FormLabel>
                                 <Input
+                                    slotProps={{
+                                        input: {
+                                            tabIndex: 6
+                                        }
+                                    }}
                                     endDecorator={
                                         !showConfirmPassword ? (
                                             <Button
@@ -266,10 +312,97 @@ export default function SignUp(): JSX.Element {
                     </Grid>
                     <Grid xs={12}>
                         <Stack>
+                            <Box height={16} />
+                            {showError && (
+                                <Alert
+                                    sx={{
+                                        alignItems: 'flex-start',
+                                        borderRadius: theme.vars.radius.lg
+                                    }}
+                                    startDecorator={<OctagonAlert />}
+                                    variant="soft"
+                                    color={'danger'}
+                                    endDecorator={
+                                        <IconButton
+                                            variant="soft"
+                                            color={'danger'}
+                                            onClick={() => setShowError(false)}
+                                        >
+                                            <X />
+                                        </IconButton>
+                                    }
+                                >
+                                    <div>
+                                        <Typography
+                                            level="title-sm"
+                                            fontWeight={700}
+                                            sx={{
+                                                color: 'var(--joy-palette-danger-700)'
+                                            }}
+                                        >
+                                            Error
+                                        </Typography>
+                                        <Box height={4}></Box>
+                                        <Stack>
+                                            {error !== null &&
+                                                typeof error === 'string' && (
+                                                    <Typography
+                                                        level="body-xs"
+                                                        sx={{
+                                                            color: 'var(--joy-palette-danger-700)'
+                                                        }}
+                                                    >
+                                                        {error}
+                                                    </Typography>
+                                                )}
+                                            {error !== null &&
+                                                Array.isArray(error) &&
+                                                error.map((v, i) => (
+                                                    <Typography
+                                                        level="body-xs"
+                                                        sx={{
+                                                            color: 'var(--joy-palette-danger-700)'
+                                                        }}
+                                                        key={i}
+                                                        startDecorator={<Dot />}
+                                                    >
+                                                        {v}
+                                                    </Typography>
+                                                ))}
+                                        </Stack>
+                                    </div>
+                                </Alert>
+                            )}
                             <Box height={24} />
                             <Button
                                 sx={{
                                     borderRadius: theme.vars.radius.md
+                                }}
+                                onClick={async () => {
+                                    await authService
+                                        .signUp({
+                                            firstName,
+                                            lastName,
+                                            username,
+                                            email,
+                                            password,
+                                            confirmPassword
+                                        })
+                                        .then(() => {
+                                            snackbar.openSnackbar(
+                                                'Congratulations! Your account has been successfully created. Please sign in to continue.',
+                                                'success',
+                                                <PartyPopper />
+                                            );
+                                            navigate('/sign-in');
+                                        })
+                                        .catch((err) => {
+                                            setError(
+                                                err.response?.data?.message ||
+                                                    'An error occurred. Please try again.'
+                                            );
+                                            setShowError(true);
+                                        });
                                 }}
                             >
                                 Sign Up
