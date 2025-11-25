@@ -8,7 +8,13 @@ import {
     Box,
     useTheme,
     Alert,
-    Grid
+    Grid,
+    Select,
+    Option,
+    Input,
+    Button,
+    FormControl,
+    FormLabel
 } from '@mui/joy';
 import { useEffect, useState, useMemo, useRef, useCallback, type JSX } from 'react';
 import type { RecipeDto } from '../../services/recipe/recipe.dto';
@@ -20,7 +26,9 @@ import {
     ThumbsDown,
     Eye,
     MessageSquareText,
-    Calendar
+    Calendar,
+    SlidersHorizontal,
+    X
 } from 'lucide-react';
 
 export default function TrendingRecipeList(): JSX.Element {
@@ -33,6 +41,13 @@ export default function TrendingRecipeList(): JSX.Element {
     const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    
+    // Filter states
+    const [startDate, setStartDate] = useState<string>('');
+    const [endDate, setEndDate] = useState<string>('');
+    const [sortBy, setSortBy] = useState<'name' | 'trendingScore' | 'createdAt'>('trendingScore');
+    const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
+    const [showFilters, setShowFilters] = useState(false);
     
     const observerTarget = useRef<HTMLDivElement>(null);
     const loadingRef = useRef(false);
@@ -76,7 +91,11 @@ export default function TrendingRecipeList(): JSX.Element {
                 
                 const response = await recipeService.getTrendingRecipes({
                     limit: ITEMS_PER_PAGE,
-                    page: 1
+                    page: 1,
+                    startDate: startDate || undefined,
+                    endDate: endDate || undefined,
+                    sortBy,
+                    sortOrder
                 });
 
                 // Add 0.5 second delay for loading state
@@ -99,7 +118,7 @@ export default function TrendingRecipeList(): JSX.Element {
         };
 
         fetchRecipes();
-    }, [ITEMS_PER_PAGE]);
+    }, [ITEMS_PER_PAGE, startDate, endDate, sortBy, sortOrder]);
 
     // Load more recipes
     const loadMoreRecipes = useCallback(async () => {
@@ -116,7 +135,11 @@ export default function TrendingRecipeList(): JSX.Element {
             const nextPage = pageRef.current + 1;
             const response = await recipeService.getTrendingRecipes({
                 limit: ITEMS_PER_PAGE,
-                page: nextPage
+                page: nextPage,
+                startDate: startDate || undefined,
+                endDate: endDate || undefined,
+                sortBy,
+                sortOrder
             });
 
             // Add 0.5 second delay for smoother loading
@@ -141,7 +164,7 @@ export default function TrendingRecipeList(): JSX.Element {
             loadingRef.current = false;
             setLoadingMore(false);
         }
-    }, [ITEMS_PER_PAGE]);
+    }, [ITEMS_PER_PAGE, startDate, endDate, sortBy, sortOrder]);
 
     // Intersection Observer for infinite scroll
     useEffect(() => {
@@ -199,17 +222,118 @@ export default function TrendingRecipeList(): JSX.Element {
                     <Stack
                         direction={'row'}
                         justifyContent={'space-between'}
+                        alignItems={'center'}
                     >
                         <Stack>
                             <Typography level="h2">
-                                What's Trending This Month
+                                Trending Recipes
                             </Typography>
                             <Typography color="neutral">
-                                Discover this month's hottest recipes loved by
-                                our community
+                                Browse all trending recipes and discover what's popular right now
                             </Typography>
                         </Stack>
+                        <Button
+                            variant="outlined"
+                            color="neutral"
+                            startDecorator={<SlidersHorizontal size={18} />}
+                            onClick={() => setShowFilters(!showFilters)}
+                            sx={{
+                                borderRadius: theme.vars.radius.lg
+                            }}
+                        >
+                            {showFilters ? 'Hide Filters' : 'Show Filters'}
+                        </Button>
                     </Stack>
+
+                    {/* Filter Section */}
+                    {showFilters && (
+                        <Box
+                            sx={{
+                                mt: 3,
+                                p: 3,
+                                borderRadius: theme.vars.radius.lg,
+                                border: '1px solid',
+                                borderColor: theme.vars.palette.neutral[200],
+                                backgroundColor: theme.vars.palette.background.surface
+                            }}
+                        >
+                            <Grid container spacing={2}>
+                                <Grid xs={12} sm={6} md={3}>
+                                    <FormControl>
+                                        <FormLabel>Start Date</FormLabel>
+                                        <Input
+                                            type="date"
+                                            value={startDate}
+                                            onChange={(e) => setStartDate(e.target.value)}
+                                            sx={{
+                                                borderRadius: theme.vars.radius.md
+                                            }}
+                                        />
+                                    </FormControl>
+                                </Grid>
+                                <Grid xs={12} sm={6} md={3}>
+                                    <FormControl>
+                                        <FormLabel>End Date</FormLabel>
+                                        <Input
+                                            type="date"
+                                            value={endDate}
+                                            onChange={(e) => setEndDate(e.target.value)}
+                                            sx={{
+                                                borderRadius: theme.vars.radius.md
+                                            }}
+                                        />
+                                    </FormControl>
+                                </Grid>
+                                <Grid xs={12} sm={6} md={3}>
+                                    <FormControl>
+                                        <FormLabel>Sort By</FormLabel>
+                                        <Select
+                                            value={sortBy}
+                                            onChange={(_, value) => value && setSortBy(value)}
+                                            sx={{
+                                                borderRadius: theme.vars.radius.md
+                                            }}
+                                        >
+                                            <Option value="trendingScore">Trending Score</Option>
+                                            <Option value="name">Name</Option>
+                                            <Option value="createdAt">Created Date</Option>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid xs={12} sm={6} md={3}>
+                                    <FormControl>
+                                        <FormLabel>Order</FormLabel>
+                                        <Select
+                                            value={sortOrder}
+                                            onChange={(_, value) => value && setSortOrder(value)}
+                                            sx={{
+                                                borderRadius: theme.vars.radius.md
+                                            }}
+                                        >
+                                            <Option value="DESC">Descending</Option>
+                                            <Option value="ASC">Ascending</Option>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                {(startDate || endDate) && (
+                                    <Grid xs={12}>
+                                        <Button
+                                            variant="plain"
+                                            color="neutral"
+                                            size="sm"
+                                            startDecorator={<X size={16} />}
+                                            onClick={() => {
+                                                setStartDate('');
+                                                setEndDate('');
+                                            }}
+                                        >
+                                            Clear Date Filters
+                                        </Button>
+                                    </Grid>
+                                )}
+                            </Grid>
+                        </Box>
+                    )}
 
                     <Box height={32}></Box>
 
@@ -363,7 +487,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                             lineHeight: 1
                                                         }}
                                                     >
-                                                        #{index + 1}
+                                                        #{recipe.ranking || index + 1}
                                                     </Typography>
                                                 </Box>
 
