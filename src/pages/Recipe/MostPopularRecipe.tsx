@@ -11,6 +11,7 @@ import {
     Alert
 } from '@mui/joy';
 import { useEffect, useState, useMemo, useRef, type JSX } from 'react';
+import { useNavigate } from 'react-router';
 import type { RecipeDto } from '../../services/recipe/recipe.dto';
 import { recipeService } from '../../services/recipe/recipe.service';
 import {
@@ -33,6 +34,7 @@ import 'swiper/css/pagination';
 
 export default function MostPopularRecipe(): JSX.Element {
     const theme = useTheme();
+    const navigate = useNavigate();
     const swiperRef = useRef<SwiperType | null>(null);
 
     const [recipes, setRecipes] = useState<RecipeDto[]>([]);
@@ -108,6 +110,7 @@ export default function MostPopularRecipe(): JSX.Element {
                     <Button
                         disabled={isButtonDisabled}
                         size="md"
+                        onClick={() => navigate('/recipe/popular')}
                         sx={{
                             height: 40,
                             paddingX: 3,
