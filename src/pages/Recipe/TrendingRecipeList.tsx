@@ -576,15 +576,34 @@ export default function TrendingRecipeList(): JSX.Element {
                     )}
 
                     {/* Infinite Scroll Loading Indicator */}
-                    {hasRecipes && loadingMore && (
+                    {hasRecipes && hasMore && (
                         <Box
                             sx={{
                                 display: 'flex',
                                 justifyContent: 'center',
-                                py: 4
+                                py: 4,
+                                minHeight: '80px'
                             }}
                         >
-                            <CircularProgress />
+                            {loadingMore && (
+                                <Box
+                                    sx={{
+                                        animation: 'fadeIn 0.3s ease-in',
+                                        '@keyframes fadeIn': {
+                                            from: {
+                                                opacity: 0,
+                                                transform: 'translateY(-10px)'
+                                            },
+                                            to: {
+                                                opacity: 1,
+                                                transform: 'translateY(0)'
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <CircularProgress />
+                                </Box>
+                            )}
                         </Box>
                     )}
 
