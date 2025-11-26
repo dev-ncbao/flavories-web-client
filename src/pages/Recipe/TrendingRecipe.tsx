@@ -44,6 +44,11 @@ export default function TrendingRecipe(): JSX.Element {
     const [isBeginning, setIsBeginning] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
 
+    // Calculate current month date range
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
     const isEmpty = useMemo(
         () => !loading && !error && recipes.length === 0,
         [loading, error, recipes.length]
@@ -63,7 +68,14 @@ export default function TrendingRecipe(): JSX.Element {
         const fetchRecipes = async () => {
             try {
                 setLoading(true);
-                const response = await recipeService.getTrendingRecipes(20);
+                
+                const response = await recipeService.getRecipes({
+                    limit: 20,
+                    sortBy: 'trendingScore',
+                    sortOrder: 'DESC',
+                    startDate: startOfMonth.toISOString(),
+                    endDate: endOfMonth.toISOString()
+                });
 
                 // Add 0.5 second delay for loading state
                 await new Promise((resolve) => setTimeout(resolve, 500));
@@ -117,12 +129,20 @@ export default function TrendingRecipe(): JSX.Element {
                         variant="outlined"
                         color="neutral"
                         startDecorator={<List size={18} />}
-                        onClick={() => navigate('/recipe/trending')}
+                        onClick={() => navigate('/recipe/discovery', {
+                            state: {
+                                startDate: startOfMonth.toISOString().split('T')[0],
+                                endDate: endOfMonth.toISOString().split('T')[0],
+                                sortBy: 'trendingScore',
+                                sortOrder: 'DESC',
+                                showFilters: true
+                            }
+                        })}
                         sx={{
                             borderRadius: theme.vars.radius.lg
                         }}
                     >
-                        See All Trending Recipes
+                        See All Trending Recipes This Month
                     </Button>
                 </Stack>
 

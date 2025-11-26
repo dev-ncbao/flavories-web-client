@@ -4,7 +4,7 @@ import TrendingRecipe from './TrendingRecipe';
 import NewRecipe from './NewRecipe';
 import MostPopularRecipe from './MostPopularRecipe';
 
-export default function RecipeSummaryPage(): JSX.Element {
+export default function RecipeSummary(): JSX.Element {
     return (
         <Stack>
             <Box height={48}></Box>

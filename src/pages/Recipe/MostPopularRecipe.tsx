@@ -63,7 +63,11 @@ export default function MostPopularRecipe(): JSX.Element {
         const fetchRecipes = async () => {
             try {
                 setLoading(true);
-                const response = await recipeService.getMostPopularRecipes(20);
+                const response = await recipeService.getRecipes({
+                    limit: 20,
+                    sortBy: 'trendingScore',
+                    sortOrder: 'DESC'
+                });
 
                 // Add 0.5 second delay for loading state
                 await new Promise((resolve) => setTimeout(resolve, 500));
@@ -114,7 +118,7 @@ export default function MostPopularRecipe(): JSX.Element {
                         variant="outlined"
                         color="neutral"
                         startDecorator={<List size={18} />}
-                        onClick={() => navigate('/recipe/popular')}
+                        onClick={() => navigate('/recipe/discovery')}
                         sx={{
                             height: 40,
                             paddingX: 3,

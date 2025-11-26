@@ -25,7 +25,7 @@ import {
     useCallback,
     type JSX
 } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import type { RecipeDto } from '../../services/recipe/recipe.dto';
 import { recipeService } from '../../services/recipe/recipe.service';
 import {
@@ -42,10 +42,20 @@ import {
     ChevronLeft
 } from 'lucide-react';
 
-export default function TrendingRecipeList(): JSX.Element {
+export default function RecipeDiscovery(): JSX.Element {
     const theme = useTheme();
     const navigate = useNavigate();
+    const location = useLocation();
     const ITEMS_PER_PAGE = 12;
+
+    // Get initial values from navigation state if available
+    const initialState = location.state as {
+        startDate?: string;
+        endDate?: string;
+        sortBy?: 'name' | 'trendingScore' | 'createdAt';
+        sortOrder?: 'ASC' | 'DESC';
+        showFilters?: boolean;
+    } | null;
 
     const [recipes, setRecipes] = useState<RecipeDto[]>([]);
     const [loading, setLoading] = useState(true);
@@ -54,14 +64,14 @@ export default function TrendingRecipeList(): JSX.Element {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
 
-    // Filter states
-    const [startDate, setStartDate] = useState<string>('');
-    const [endDate, setEndDate] = useState<string>('');
+    // Filter states - initialize from navigation state if available
+    const [startDate, setStartDate] = useState<string>(initialState?.startDate || '');
+    const [endDate, setEndDate] = useState<string>(initialState?.endDate || '');
     const [sortBy, setSortBy] = useState<
         'name' | 'trendingScore' | 'createdAt'
-    >('trendingScore');
-    const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
-    const [showFilters, setShowFilters] = useState(false);
+    >(initialState?.sortBy || 'trendingScore');
+    const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>(initialState?.sortOrder || 'DESC');
+    const [showFilters, setShowFilters] = useState(initialState?.showFilters || false);
     const [isFilterAnimating, setIsFilterAnimating] = useState(false);
 
     const observerTarget = useRef<HTMLDivElement>(null);
@@ -104,7 +114,7 @@ export default function TrendingRecipeList(): JSX.Element {
                 loadingRef.current = false;
                 console.log('Initial fetch starting...');
 
-                const response = await recipeService.getTrendingRecipes({
+                const response = await recipeService.getRecipes({
                     limit: ITEMS_PER_PAGE,
                     page: 1,
                     startDate: startDate || undefined,
@@ -156,7 +166,7 @@ export default function TrendingRecipeList(): JSX.Element {
             loadingRef.current = true;
             setLoadingMore(true);
             const nextPage = pageRef.current + 1;
-            const response = await recipeService.getTrendingRecipes({
+            const response = await recipeService.getRecipes({
                 limit: ITEMS_PER_PAGE,
                 page: nextPage,
                 startDate: startDate || undefined,
