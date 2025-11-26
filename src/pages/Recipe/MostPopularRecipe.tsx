@@ -23,7 +23,8 @@ import {
     MessageSquareText,
     Calendar,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    List
 } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -100,6 +101,7 @@ export default function MostPopularRecipe(): JSX.Element {
                 <Stack
                     direction={'row'}
                     justifyContent={'space-between'}
+                    alignItems={'center'}
                 >
                     <Stack>
                         <Typography level="h2">Most Popular</Typography>
@@ -109,7 +111,9 @@ export default function MostPopularRecipe(): JSX.Element {
                     </Stack>
                     <Button
                         disabled={isButtonDisabled}
-                        size="md"
+                        variant="outlined"
+                        color="neutral"
+                        startDecorator={<List size={18} />}
                         onClick={() => navigate('/recipe/popular')}
                         sx={{
                             height: 40,
@@ -460,9 +464,11 @@ export default function MostPopularRecipe(): JSX.Element {
                                                     level="body-sm"
                                                     fontWeight={600}
                                                 >
-                                                    {recipe.rating?.toFixed(
-                                                        1
-                                                    ) || '0.0'}
+                                                    {recipe.rating
+                                                        ? Number(
+                                                              recipe.rating
+                                                          ).toFixed(1)
+                                                        : '0.0'}
                                                 </Typography>
                                             </Stack>
 

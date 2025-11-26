@@ -14,9 +14,18 @@ import {
     Input,
     Button,
     FormControl,
-    FormLabel
+    FormLabel,
+    Link
 } from '@mui/joy';
-import { useEffect, useState, useMemo, useRef, useCallback, type JSX } from 'react';
+import {
+    useEffect,
+    useState,
+    useMemo,
+    useRef,
+    useCallback,
+    type JSX
+} from 'react';
+import { useNavigate } from 'react-router';
 import type { RecipeDto } from '../../services/recipe/recipe.dto';
 import { recipeService } from '../../services/recipe/recipe.service';
 import {
@@ -28,11 +37,14 @@ import {
     MessageSquareText,
     Calendar,
     SlidersHorizontal,
-    X
+    X,
+    Trophy,
+    ChevronLeft
 } from 'lucide-react';
 
 export default function TrendingRecipeList(): JSX.Element {
     const theme = useTheme();
+    const navigate = useNavigate();
     const ITEMS_PER_PAGE = 12;
 
     const [recipes, setRecipes] = useState<RecipeDto[]>([]);
@@ -41,14 +53,17 @@ export default function TrendingRecipeList(): JSX.Element {
     const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-    
+
     // Filter states
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
-    const [sortBy, setSortBy] = useState<'name' | 'trendingScore' | 'createdAt'>('trendingScore');
+    const [sortBy, setSortBy] = useState<
+        'name' | 'trendingScore' | 'createdAt'
+    >('trendingScore');
     const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
     const [showFilters, setShowFilters] = useState(false);
-    
+    const [isFilterAnimating, setIsFilterAnimating] = useState(false);
+
     const observerTarget = useRef<HTMLDivElement>(null);
     const loadingRef = useRef(false);
     const hasMoreRef = useRef(true);
@@ -88,7 +103,7 @@ export default function TrendingRecipeList(): JSX.Element {
                 hasMoreRef.current = true;
                 loadingRef.current = false;
                 console.log('Initial fetch starting...');
-                
+
                 const response = await recipeService.getTrendingRecipes({
                     limit: ITEMS_PER_PAGE,
                     page: 1,
@@ -100,8 +115,13 @@ export default function TrendingRecipeList(): JSX.Element {
 
                 // Add 0.5 second delay for loading state
                 await new Promise((resolve) => setTimeout(resolve, 500));
-                
-                console.log('Initial fetch completed:', response.data.length, 'recipes');
+
+                console.log(
+                    'Initial fetch completed:',
+                    response.data.length,
+                    'recipes'
+                );
+
                 setRecipes(response.data);
                 const hasMoreData = response.data.length === ITEMS_PER_PAGE;
                 setHasMore(hasMoreData);
@@ -123,12 +143,15 @@ export default function TrendingRecipeList(): JSX.Element {
     // Load more recipes
     const loadMoreRecipes = useCallback(async () => {
         if (loadingRef.current || !hasMoreRef.current) {
-            console.log('Load more skipped:', { loading: loadingRef.current, hasMore: hasMoreRef.current });
+            console.log('Load more skipped:', {
+                loading: loadingRef.current,
+                hasMore: hasMoreRef.current
+            });
             return;
         }
 
         console.log('Loading more recipes, current page:', pageRef.current);
-        
+
         try {
             loadingRef.current = true;
             setLoadingMore(true);
@@ -170,7 +193,10 @@ export default function TrendingRecipeList(): JSX.Element {
     useEffect(() => {
         // Wait for recipes to load and target to be in DOM
         if (!observerTarget.current || loading) {
-            console.log('Observer not ready:', { hasTarget: !!observerTarget.current, loading });
+            console.log('Observer not ready:', {
+                hasTarget: !!observerTarget.current,
+                loading
+            });
             return;
         }
 
@@ -178,12 +204,15 @@ export default function TrendingRecipeList(): JSX.Element {
 
         const observer = new IntersectionObserver(
             (entries) => {
-                console.log('Intersection triggered:', entries[0].isIntersecting);
+                console.log(
+                    'Intersection triggered:',
+                    entries[0].isIntersecting
+                );
                 if (entries[0].isIntersecting) {
                     loadMoreRecipes();
                 }
             },
-            { 
+            {
                 threshold: 0.1,
                 rootMargin: '100px'
             }
@@ -219,24 +248,58 @@ export default function TrendingRecipeList(): JSX.Element {
                     direction={'column'}
                     width={'inherit'}
                 >
+                    {/* Back Button */}
+                    <Stack alignSelf={'flex-start'}>
+                        <Link
+                            startDecorator={<ChevronLeft />}
+                            variant="plain"
+                            color="success"
+                            padding={0}
+                            onClick={() => navigate(-1)}
+                            sx={{
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <Typography
+                                level="body-sm"
+                                color="success"
+                                fontWeight={600}
+                            >
+                                Back
+                            </Typography>
+                        </Link>
+                    </Stack>
+                    <Box height={16} />
+
                     <Stack
                         direction={'row'}
                         justifyContent={'space-between'}
                         alignItems={'center'}
                     >
                         <Stack>
-                            <Typography level="h2">
-                                Trending Recipes
-                            </Typography>
+                            <Typography level="h2">Trending Recipes</Typography>
                             <Typography color="neutral">
-                                Browse all trending recipes and discover what's popular right now
+                                Browse all trending recipes and discover what's
+                                popular right now
                             </Typography>
                         </Stack>
                         <Button
                             variant="outlined"
                             color="neutral"
                             startDecorator={<SlidersHorizontal size={18} />}
-                            onClick={() => setShowFilters(!showFilters)}
+                            onClick={() => {
+                                if (showFilters) {
+                                    // Closing: trigger animation then hide
+                                    setIsFilterAnimating(true);
+                                    setTimeout(() => {
+                                        setShowFilters(false);
+                                        setIsFilterAnimating(false);
+                                    }, 300); // Match animation duration
+                                } else {
+                                    // Opening: show immediately
+                                    setShowFilters(true);
+                                }
+                            }}
                             sx={{
                                 borderRadius: theme.vars.radius.lg
                             }}
@@ -254,64 +317,132 @@ export default function TrendingRecipeList(): JSX.Element {
                                 borderRadius: theme.vars.radius.lg,
                                 border: '1px solid',
                                 borderColor: theme.vars.palette.neutral[200],
-                                backgroundColor: theme.vars.palette.background.surface
+                                backgroundColor:
+                                    theme.vars.palette.background.surface,
+                                animation: isFilterAnimating 
+                                    ? 'slideUp 0.3s ease-out forwards' 
+                                    : 'slideDown 0.3s ease-out',
+                                transformOrigin: 'top',
+                                '@keyframes slideDown': {
+                                    from: {
+                                        opacity: 0,
+                                        transform: 'translateY(-20px) scaleY(0.95)',
+                                        maxHeight: 0
+                                    },
+                                    to: {
+                                        opacity: 1,
+                                        transform: 'translateY(0) scaleY(1)',
+                                        maxHeight: '500px'
+                                    }
+                                },
+                                '@keyframes slideUp': {
+                                    from: {
+                                        opacity: 1,
+                                        transform: 'translateY(0) scaleY(1)',
+                                        maxHeight: '500px'
+                                    },
+                                    to: {
+                                        opacity: 0,
+                                        transform: 'translateY(-20px) scaleY(0.95)',
+                                        maxHeight: 0
+                                    }
+                                }
                             }}
                         >
-                            <Grid container spacing={2}>
-                                <Grid xs={12} sm={6} md={3}>
+                            <Grid
+                                container
+                                spacing={2}
+                            >
+                                <Grid
+                                    xs={12}
+                                    sm={6}
+                                    md={3}
+                                >
                                     <FormControl>
                                         <FormLabel>Start Date</FormLabel>
                                         <Input
                                             type="date"
                                             value={startDate}
-                                            onChange={(e) => setStartDate(e.target.value)}
+                                            onChange={(e) =>
+                                                setStartDate(e.target.value)
+                                            }
                                             sx={{
-                                                borderRadius: theme.vars.radius.md
+                                                borderRadius:
+                                                    theme.vars.radius.md
                                             }}
                                         />
                                     </FormControl>
                                 </Grid>
-                                <Grid xs={12} sm={6} md={3}>
+                                <Grid
+                                    xs={12}
+                                    sm={6}
+                                    md={3}
+                                >
                                     <FormControl>
                                         <FormLabel>End Date</FormLabel>
                                         <Input
                                             type="date"
                                             value={endDate}
-                                            onChange={(e) => setEndDate(e.target.value)}
+                                            onChange={(e) =>
+                                                setEndDate(e.target.value)
+                                            }
                                             sx={{
-                                                borderRadius: theme.vars.radius.md
+                                                borderRadius:
+                                                    theme.vars.radius.md
                                             }}
                                         />
                                     </FormControl>
                                 </Grid>
-                                <Grid xs={12} sm={6} md={3}>
+                                <Grid
+                                    xs={12}
+                                    sm={6}
+                                    md={3}
+                                >
                                     <FormControl>
                                         <FormLabel>Sort By</FormLabel>
                                         <Select
                                             value={sortBy}
-                                            onChange={(_, value) => value && setSortBy(value)}
+                                            onChange={(_, value) =>
+                                                value && setSortBy(value)
+                                            }
                                             sx={{
-                                                borderRadius: theme.vars.radius.md
+                                                borderRadius:
+                                                    theme.vars.radius.md
                                             }}
                                         >
-                                            <Option value="trendingScore">Trending Score</Option>
+                                            <Option value="trendingScore">
+                                                Trending Score
+                                            </Option>
                                             <Option value="name">Name</Option>
-                                            <Option value="createdAt">Created Date</Option>
+                                            <Option value="createdAt">
+                                                Created Date
+                                            </Option>
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid xs={12} sm={6} md={3}>
+                                <Grid
+                                    xs={12}
+                                    sm={6}
+                                    md={3}
+                                >
                                     <FormControl>
                                         <FormLabel>Order</FormLabel>
                                         <Select
                                             value={sortOrder}
-                                            onChange={(_, value) => value && setSortOrder(value)}
+                                            onChange={(_, value) =>
+                                                value && setSortOrder(value)
+                                            }
                                             sx={{
-                                                borderRadius: theme.vars.radius.md
+                                                borderRadius:
+                                                    theme.vars.radius.md
                                             }}
                                         >
-                                            <Option value="DESC">Descending</Option>
-                                            <Option value="ASC">Ascending</Option>
+                                            <Option value="DESC">
+                                                Descending
+                                            </Option>
+                                            <Option value="ASC">
+                                                Ascending
+                                            </Option>
                                         </Select>
                                     </FormControl>
                                 </Grid>
@@ -415,9 +546,17 @@ export default function TrendingRecipeList(): JSX.Element {
                     )}
 
                     {hasRecipes && (
-                        <Grid container spacing={3}>
-                            {recipes.map((recipe, index) => (
-                                <Grid xs={12} sm={6} md={4} key={recipe.id}>
+                        <Grid
+                            container
+                            spacing={3}
+                        >
+                            {recipes.map((recipe) => (
+                                <Grid
+                                    xs={12}
+                                    sm={6}
+                                    md={4}
+                                    key={recipe.id}
+                                >
                                     <Card
                                         variant="outlined"
                                         sx={{
@@ -430,8 +569,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                     theme.vars.palette
                                                         .primary[500],
                                                 boxShadow: `0 4px 20px rgba(${theme.vars.palette.primary.mainChannel} / 0.2)`,
-                                                transform:
-                                                    'translateY(-4px)'
+                                                transform: 'translateY(-4px)'
                                             }
                                         }}
                                     >
@@ -446,8 +584,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                 <img
                                                     src={recipe.image}
                                                     alt={
-                                                        recipe.name ||
-                                                        'Recipe'
+                                                        recipe.name || 'Recipe'
                                                     }
                                                     loading="lazy"
                                                 />
@@ -455,8 +592,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                 {/* Trending Rank Badge - Top Left Corner */}
                                                 <Box
                                                     sx={{
-                                                        position:
-                                                            'absolute',
+                                                        position: 'absolute',
                                                         top: 0,
                                                         left: 0,
                                                         backgroundColor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.9)`,
@@ -469,8 +605,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                         padding: '6px 10px',
                                                         minWidth: 32,
                                                         display: 'flex',
-                                                        alignItems:
-                                                            'center',
+                                                        alignItems: 'center',
                                                         justifyContent:
                                                             'center',
                                                         boxShadow:
@@ -481,21 +616,23 @@ export default function TrendingRecipeList(): JSX.Element {
                                                         level="body-sm"
                                                         sx={{
                                                             color: 'white',
-                                                            fontWeight: 700,
+                                                            fontWeight: 500,
                                                             fontSize:
                                                                 '0.875rem',
                                                             lineHeight: 1
                                                         }}
+                                                        startDecorator={
+                                                            <Trophy size={18} />
+                                                        }
                                                     >
-                                                        #{recipe.ranking || index + 1}
+                                                        {recipe.trendingScore}
                                                     </Typography>
                                                 </Box>
 
                                                 {/* Date Badge - Top Right */}
                                                 <Box
                                                     sx={{
-                                                        position:
-                                                            'absolute',
+                                                        position: 'absolute',
                                                         top: 12,
                                                         right: 12,
                                                         backgroundColor:
@@ -506,12 +643,11 @@ export default function TrendingRecipeList(): JSX.Element {
                                                             'blur(20px) saturate(120%)',
                                                         border: '1px solid rgba(255, 255, 255, 0.2)',
                                                         borderRadius:
-                                                            theme.vars
-                                                                .radius.md,
+                                                            theme.vars.radius
+                                                                .md,
                                                         padding: '4px 8px',
                                                         display: 'flex',
-                                                        alignItems:
-                                                            'center',
+                                                        alignItems: 'center',
                                                         gap: 0.5
                                                     }}
                                                 >
@@ -565,13 +701,11 @@ export default function TrendingRecipeList(): JSX.Element {
                                                     <Star
                                                         size={16}
                                                         fill={
-                                                            theme.vars
-                                                                .palette
+                                                            theme.vars.palette
                                                                 .yellow[400]
                                                         }
                                                         color={
-                                                            theme.vars
-                                                                .palette
+                                                            theme.vars.palette
                                                                 .yellow[400]
                                                         }
                                                     />
@@ -579,9 +713,11 @@ export default function TrendingRecipeList(): JSX.Element {
                                                         level="body-sm"
                                                         fontWeight={600}
                                                     >
-                                                        {recipe.rating?.toFixed(
-                                                            1
-                                                        ) || '0.0'}
+                                                        {recipe.rating
+                                                            ? Number(
+                                                                  recipe.rating
+                                                              ).toFixed(1)
+                                                            : '0.0'}
                                                     </Typography>
                                                 </Stack>
 
@@ -594,8 +730,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                     <ThumbsUp
                                                         size={16}
                                                         color={
-                                                            theme.vars
-                                                                .palette
+                                                            theme.vars.palette
                                                                 .green[500]
                                                         }
                                                     />
@@ -603,8 +738,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                         level="body-sm"
                                                         fontWeight={600}
                                                     >
-                                                        {recipe.likeCount ||
-                                                            0}
+                                                        {recipe.likeCount || 0}
                                                     </Typography>
                                                 </Stack>
 
@@ -617,8 +751,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                     <ThumbsDown
                                                         size={16}
                                                         color={
-                                                            theme.vars
-                                                                .palette
+                                                            theme.vars.palette
                                                                 .red[500]
                                                         }
                                                     />
@@ -640,8 +773,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                     <Eye
                                                         size={16}
                                                         color={
-                                                            theme.vars
-                                                                .palette
+                                                            theme.vars.palette
                                                                 .blue[500]
                                                         }
                                                     />
@@ -649,8 +781,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                         level="body-sm"
                                                         fontWeight={600}
                                                     >
-                                                        {recipe.viewCount ||
-                                                            0}
+                                                        {recipe.viewCount || 0}
                                                     </Typography>
                                                 </Stack>
 
@@ -663,8 +794,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                     <MessageSquareText
                                                         size={16}
                                                         color={
-                                                            theme.vars
-                                                                .palette
+                                                            theme.vars.palette
                                                                 .purple[500]
                                                         }
                                                     />
@@ -683,8 +813,7 @@ export default function TrendingRecipeList(): JSX.Element {
                                                     color: 'var(--joy-palette-neutral-500)',
                                                     display: '-webkit-box',
                                                     WebkitLineClamp: 3,
-                                                    WebkitBoxOrient:
-                                                        'vertical',
+                                                    WebkitBoxOrient: 'vertical',
                                                     overflow: 'hidden',
                                                     textOverflow: 'ellipsis'
                                                 }}

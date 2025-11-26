@@ -23,7 +23,8 @@ import {
     MessageSquareText,
     Calendar,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    List
 } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -100,20 +101,24 @@ export default function TrendingRecipe(): JSX.Element {
                 <Stack
                     direction={'row'}
                     justifyContent={'space-between'}
+                    alignItems={'center'}
                 >
                     <Stack>
-                        <Typography level="h2">What's Trending This Month</Typography>
+                        <Typography level="h2">
+                            What's Trending This Month
+                        </Typography>
                         <Typography color="neutral">
-                            Discover this month's hottest recipes loved by our community
+                            Discover this month's hottest recipes loved by our
+                            community
                         </Typography>
                     </Stack>
                     <Button
                         disabled={isButtonDisabled}
-                        size="md"
+                        variant="outlined"
+                        color="neutral"
+                        startDecorator={<List size={18} />}
                         onClick={() => navigate('/recipe/trending')}
                         sx={{
-                            height: 40,
-                            paddingX: 3,
                             borderRadius: theme.vars.radius.lg
                         }}
                     >
@@ -239,7 +244,8 @@ export default function TrendingRecipe(): JSX.Element {
                                     boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)'
                                 },
                                 '&:disabled': {
-                                    backgroundColor: theme.vars.palette.neutral[200],
+                                    backgroundColor:
+                                        theme.vars.palette.neutral[200],
                                     color: theme.vars.palette.neutral[400],
                                     cursor: 'not-allowed',
                                     boxShadow: 'none',
@@ -274,7 +280,8 @@ export default function TrendingRecipe(): JSX.Element {
                                     boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)'
                                 },
                                 '&:disabled': {
-                                    backgroundColor: theme.vars.palette.neutral[200],
+                                    backgroundColor:
+                                        theme.vars.palette.neutral[200],
                                     color: theme.vars.palette.neutral[400],
                                     cursor: 'not-allowed',
                                     boxShadow: 'none',
@@ -314,258 +321,269 @@ export default function TrendingRecipe(): JSX.Element {
                         >
                             {recipes.map((recipe, index) => (
                                 <SwiperSlide key={recipe.id}>
-                                <Card
-                                    variant="outlined"
-                                    sx={{
-                                        height: '100%',
-                                        cursor: 'pointer',
-                                        borderRadius: 24,
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': {
-                                            borderColor:
-                                                theme.vars.palette.primary[500],
-                                            boxShadow: `0 4px 20px rgba(${theme.vars.palette.primary.mainChannel} / 0.2)`,
-                                            transform: 'translateY(-4px)'
-                                        }
-                                    }}
-                                >
-                                    {recipe.image && (
-                                        <AspectRatio
-                                            ratio="16/9"
-                                            sx={{
-                                                borderRadius:
-                                                    theme.vars.radius.lg
-                                            }}
-                                        >
-                                            <img
-                                                src={recipe.image}
-                                                alt={recipe.name || 'Recipe'}
-                                                loading="lazy"
-                                            />
-
-                                            {/* Trending Rank Badge - Top Left Corner */}
-                                            <Box
+                                    <Card
+                                        variant="outlined"
+                                        sx={{
+                                            height: '100%',
+                                            cursor: 'pointer',
+                                            borderRadius: 24,
+                                            transition: 'all 0.3s ease',
+                                            '&:hover': {
+                                                borderColor:
+                                                    theme.vars.palette
+                                                        .primary[500],
+                                                boxShadow: `0 4px 20px rgba(${theme.vars.palette.primary.mainChannel} / 0.2)`,
+                                                transform: 'translateY(-4px)'
+                                            }
+                                        }}
+                                    >
+                                        {recipe.image && (
+                                            <AspectRatio
+                                                ratio="16/9"
                                                 sx={{
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    backgroundColor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.9)`,
-                                                    backdropFilter:
-                                                        'blur(20px) saturate(120%)',
-                                                    WebkitBackdropFilter:
-                                                        'blur(20px) saturate(120%)',
-                                                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                                                    borderRadius: `0 0 ${theme.vars.radius.lg} 0`,
-                                                    padding: '6px 10px',
-                                                    minWidth: 32,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    boxShadow:
-                                                        '0 2px 8px rgba(0, 0, 0, 0.2)'
-                                                }}
-                                            >
-                                                <Typography
-                                                    level="body-sm"
-                                                    sx={{
-                                                        color: 'white',
-                                                        fontWeight: 700,
-                                                        fontSize: '0.875rem',
-                                                        lineHeight: 1
-                                                    }}
-                                                >
-                                                    #{index + 1}
-                                                </Typography>
-                                            </Box>
-
-                                            {/* Date Badge - Top Right */}
-                                            <Box
-                                                sx={{
-                                                    position: 'absolute',
-                                                    top: 12,
-                                                    right: 12,
-                                                    backgroundColor:
-                                                        'rgba(0, 0, 0, 0.25)',
-                                                    backdropFilter:
-                                                        'blur(20px) saturate(120%)',
-                                                    WebkitBackdropFilter:
-                                                        'blur(20px) saturate(120%)',
-                                                    border: '1px solid rgba(255, 255, 255, 0.2)',
                                                     borderRadius:
-                                                        theme.vars.radius.md,
-                                                    padding: '4px 8px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: 0.5
+                                                        theme.vars.radius.lg
                                                 }}
                                             >
-                                                <Calendar
-                                                    size={12}
-                                                    color="white"
+                                                <img
+                                                    src={recipe.image}
+                                                    alt={
+                                                        recipe.name || 'Recipe'
+                                                    }
+                                                    loading="lazy"
                                                 />
-                                                <Typography
-                                                    level="body-xs"
+
+                                                {/* Trending Rank Badge - Top Left Corner */}
+                                                <Box
                                                     sx={{
-                                                        color: 'white',
-                                                        fontWeight: 500
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        backgroundColor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.9)`,
+                                                        backdropFilter:
+                                                            'blur(20px) saturate(120%)',
+                                                        WebkitBackdropFilter:
+                                                            'blur(20px) saturate(120%)',
+                                                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                                                        borderRadius: `0 0 ${theme.vars.radius.lg} 0`,
+                                                        padding: '6px 10px',
+                                                        minWidth: 32,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent:
+                                                            'center',
+                                                        boxShadow:
+                                                            '0 2px 8px rgba(0, 0, 0, 0.2)'
                                                     }}
                                                 >
-                                                    {recipe.createdAt
-                                                        ? new Date(
-                                                              recipe.createdAt
-                                                          ).toLocaleDateString(
-                                                              'en-US',
-                                                              {
-                                                                  month: 'short',
-                                                                  day: 'numeric',
-                                                                  year: 'numeric'
-                                                              }
-                                                          )
-                                                        : 'Unknown'}
-                                                </Typography>
-                                            </Box>
-                                        </AspectRatio>
-                                    )}
-                                    <CardContent>
-                                        <Typography
-                                            level="title-lg"
-                                            sx={{ mb: 1 }}
-                                        >
-                                            {recipe.name || 'Untitled Recipe'}
-                                        </Typography>
-                                        <Stack
-                                            direction="row"
-                                            spacing={2}
-                                            alignItems="center"
-                                            sx={{ mb: 1.5 }}
-                                        >
-                                            {/* Rating */}
-                                            <Stack
-                                                direction="row"
-                                                spacing={0.5}
-                                                alignItems="center"
-                                            >
-                                                <Star
-                                                    size={16}
-                                                    fill={
-                                                        theme.vars.palette
-                                                            .yellow[400]
-                                                    }
-                                                    color={
-                                                        theme.vars.palette
-                                                            .yellow[400]
-                                                    }
-                                                />
-                                                <Typography
-                                                    level="body-sm"
-                                                    fontWeight={600}
-                                                >
-                                                    {recipe.rating?.toFixed(
-                                                        1
-                                                    ) || '0.0'}
-                                                </Typography>
-                                            </Stack>
+                                                    <Typography
+                                                        level="body-sm"
+                                                        sx={{
+                                                            color: 'white',
+                                                            fontWeight: 500,
+                                                            fontSize:
+                                                                '0.875rem',
+                                                            lineHeight: 1
+                                                        }}
+                                                    >
+                                                        #{index + 1}
+                                                    </Typography>
+                                                </Box>
 
-                                            {/* Like */}
+                                                {/* Date Badge - Top Right */}
+                                                <Box
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        top: 12,
+                                                        right: 12,
+                                                        backgroundColor:
+                                                            'rgba(0, 0, 0, 0.25)',
+                                                        backdropFilter:
+                                                            'blur(20px) saturate(120%)',
+                                                        WebkitBackdropFilter:
+                                                            'blur(20px) saturate(120%)',
+                                                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                                                        borderRadius:
+                                                            theme.vars.radius
+                                                                .md,
+                                                        padding: '4px 8px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 0.5
+                                                    }}
+                                                >
+                                                    <Calendar
+                                                        size={12}
+                                                        color="white"
+                                                    />
+                                                    <Typography
+                                                        level="body-xs"
+                                                        sx={{
+                                                            color: 'white',
+                                                            fontWeight: 500
+                                                        }}
+                                                    >
+                                                        {recipe.createdAt
+                                                            ? new Date(
+                                                                  recipe.createdAt
+                                                              ).toLocaleDateString(
+                                                                  'en-US',
+                                                                  {
+                                                                      month: 'short',
+                                                                      day: 'numeric',
+                                                                      year: 'numeric'
+                                                                  }
+                                                              )
+                                                            : 'Unknown'}
+                                                    </Typography>
+                                                </Box>
+                                            </AspectRatio>
+                                        )}
+                                        <CardContent>
+                                            <Typography
+                                                level="title-lg"
+                                                sx={{ mb: 1 }}
+                                            >
+                                                {recipe.name ||
+                                                    'Untitled Recipe'}
+                                            </Typography>
                                             <Stack
                                                 direction="row"
-                                                spacing={0.5}
+                                                spacing={2}
                                                 alignItems="center"
+                                                sx={{ mb: 1.5 }}
                                             >
-                                                <ThumbsUp
-                                                    size={16}
-                                                    color={
-                                                        theme.vars.palette
-                                                            .green[500]
-                                                    }
-                                                />
-                                                <Typography
-                                                    level="body-sm"
-                                                    fontWeight={600}
+                                                {/* Rating */}
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={0.5}
+                                                    alignItems="center"
                                                 >
-                                                    {recipe.likeCount || 0}
-                                                </Typography>
-                                            </Stack>
+                                                    <Star
+                                                        size={16}
+                                                        fill={
+                                                            theme.vars.palette
+                                                                .yellow[400]
+                                                        }
+                                                        color={
+                                                            theme.vars.palette
+                                                                .yellow[400]
+                                                        }
+                                                    />
+                                                    <Typography
+                                                        level="body-sm"
+                                                        fontWeight={600}
+                                                    >
+                                                        {recipe.rating
+                                                            ? Number(
+                                                                  recipe.rating
+                                                              ).toFixed(1)
+                                                            : '0.0'}
+                                                    </Typography>
+                                                </Stack>
 
-                                            {/* Dislike */}
-                                            <Stack
-                                                direction="row"
-                                                spacing={0.5}
-                                                alignItems="center"
-                                            >
-                                                <ThumbsDown
-                                                    size={16}
-                                                    color={
-                                                        theme.vars.palette
-                                                            .red[500]
-                                                    }
-                                                />
-                                                <Typography
-                                                    level="body-sm"
-                                                    fontWeight={600}
+                                                {/* Like */}
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={0.5}
+                                                    alignItems="center"
                                                 >
-                                                    {recipe.dislikeCount || 0}
-                                                </Typography>
-                                            </Stack>
+                                                    <ThumbsUp
+                                                        size={16}
+                                                        color={
+                                                            theme.vars.palette
+                                                                .green[500]
+                                                        }
+                                                    />
+                                                    <Typography
+                                                        level="body-sm"
+                                                        fontWeight={600}
+                                                    >
+                                                        {recipe.likeCount || 0}
+                                                    </Typography>
+                                                </Stack>
 
-                                            {/* View Count */}
-                                            <Stack
-                                                direction="row"
-                                                spacing={0.5}
-                                                alignItems="center"
-                                            >
-                                                <Eye
-                                                    size={16}
-                                                    color={
-                                                        theme.vars.palette
-                                                            .blue[500]
-                                                    }
-                                                />
-                                                <Typography
-                                                    level="body-sm"
-                                                    fontWeight={600}
+                                                {/* Dislike */}
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={0.5}
+                                                    alignItems="center"
                                                 >
-                                                    {recipe.viewCount || 0}
-                                                </Typography>
-                                            </Stack>
+                                                    <ThumbsDown
+                                                        size={16}
+                                                        color={
+                                                            theme.vars.palette
+                                                                .red[500]
+                                                        }
+                                                    />
+                                                    <Typography
+                                                        level="body-sm"
+                                                        fontWeight={600}
+                                                    >
+                                                        {recipe.dislikeCount ||
+                                                            0}
+                                                    </Typography>
+                                                </Stack>
 
-                                            {/* Comment Count */}
-                                            <Stack
-                                                direction="row"
-                                                spacing={0.5}
-                                                alignItems="center"
-                                            >
-                                                <MessageSquareText
-                                                    size={16}
-                                                    color={
-                                                        theme.vars.palette
-                                                            .purple[500]
-                                                    }
-                                                />
-                                                <Typography
-                                                    level="body-sm"
-                                                    fontWeight={600}
+                                                {/* View Count */}
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={0.5}
+                                                    alignItems="center"
                                                 >
-                                                    {recipe.commentCount || 0}
-                                                </Typography>
+                                                    <Eye
+                                                        size={16}
+                                                        color={
+                                                            theme.vars.palette
+                                                                .blue[500]
+                                                        }
+                                                    />
+                                                    <Typography
+                                                        level="body-sm"
+                                                        fontWeight={600}
+                                                    >
+                                                        {recipe.viewCount || 0}
+                                                    </Typography>
+                                                </Stack>
+
+                                                {/* Comment Count */}
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={0.5}
+                                                    alignItems="center"
+                                                >
+                                                    <MessageSquareText
+                                                        size={16}
+                                                        color={
+                                                            theme.vars.palette
+                                                                .purple[500]
+                                                        }
+                                                    />
+                                                    <Typography
+                                                        level="body-sm"
+                                                        fontWeight={600}
+                                                    >
+                                                        {recipe.commentCount ||
+                                                            0}
+                                                    </Typography>
+                                                </Stack>
                                             </Stack>
-                                        </Stack>
-                                        <Typography
-                                            level="body-sm"
-                                            sx={{
-                                                color: 'var(--joy-palette-neutral-500)',
-                                                display: '-webkit-box',
-                                                WebkitLineClamp: 3,
-                                                WebkitBoxOrient: 'vertical',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis'
-                                            }}
-                                        >
-                                            {recipe.description ||
-                                                'No description available.'}
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
+                                            <Typography
+                                                level="body-sm"
+                                                sx={{
+                                                    color: 'var(--joy-palette-neutral-500)',
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 3,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis'
+                                                }}
+                                            >
+                                                {recipe.description ||
+                                                    'No description available.'}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
                                 </SwiperSlide>
                             ))}
                         </Swiper>

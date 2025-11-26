@@ -46,14 +46,23 @@ export default function SignIn(): JSX.Element {
                         variant="plain"
                         color="success"
                         padding={0}
-                        onClick={() => navigate('/')}
+                        onClick={() => {
+                            if (window.history.length > 1) {
+                                navigate(-1);
+                            } else {
+                                navigate('/');
+                            }
+                        }}
+                        sx={{
+                            cursor: 'pointer'
+                        }}
                     >
                         <Typography
                             level="body-sm"
                             color="success"
                             fontWeight={600}
                         >
-                            Back to Home
+                            Back
                         </Typography>
                     </Link>
                 </Stack>
