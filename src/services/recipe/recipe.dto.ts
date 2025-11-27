@@ -2,7 +2,7 @@ export class RecipeDto {
     id?: number;
     name?: string;
     description?: string;
-    image?: string;
+    thumbnail?: string;
     rating?: number;
     likeCount?: number;
     dislikeCount?: number;

@@ -6,6 +6,7 @@ import LandingPage from '../pages/LandingPage/LandingPage';
 import NotFound from '../pages/NotFound';
 import RecipeSummary from '../pages/Recipe/RecipeSummary';
 import RecipeDiscovery from '../pages/Recipe/RecipeDiscovery';
+import RecipeDetail from '../pages/Recipe/RecipeDetail';
 
 export const appRoutes = [
     {
@@ -15,6 +16,7 @@ export const appRoutes = [
             { index: true, element: <LandingPage /> },
             { path: 'recipe', element: <RecipeSummary /> },
             { path: 'recipe/discovery', element: <RecipeDiscovery /> },
+            { path: 'recipe/:id', element: <RecipeDetail /> },
             { path: 'community', element: <Community /> }
         ]
     },

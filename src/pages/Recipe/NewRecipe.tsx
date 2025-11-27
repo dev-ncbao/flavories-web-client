@@ -356,6 +356,7 @@ export default function NewRecipe(): JSX.Element {
                                 <SwiperSlide key={recipe.id}>
                                     <Card
                                         variant="outlined"
+                                        onClick={() => navigate(`/recipe/${recipe.id}`)}
                                         sx={{
                                             height: '100%',
                                             cursor: 'pointer',
@@ -370,7 +371,7 @@ export default function NewRecipe(): JSX.Element {
                                             }
                                         }}
                                     >
-                                        {recipe.image && (
+                                        {recipe.thumbnail && (
                                             <AspectRatio
                                                 ratio="16/9"
                                                 sx={{
@@ -379,7 +380,7 @@ export default function NewRecipe(): JSX.Element {
                                                 }}
                                             >
                                                 <img
-                                                    src={recipe.image}
+                                                    src={recipe.thumbnail}
                                                     alt={
                                                         recipe.name || 'Recipe'
                                                     }

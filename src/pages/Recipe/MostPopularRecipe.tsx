@@ -324,6 +324,7 @@ export default function MostPopularRecipe(): JSX.Element {
                                 <SwiperSlide key={recipe.id}>
                                 <Card
                                     variant="outlined"
+                                    onClick={() => navigate(`/recipe/${recipe.id}`)}
                                     sx={{
                                         height: '100%',
                                         cursor: 'pointer',
@@ -337,7 +338,7 @@ export default function MostPopularRecipe(): JSX.Element {
                                         }
                                     }}
                                 >
-                                    {recipe.image && (
+                                    {recipe.thumbnail && (
                                         <AspectRatio
                                             ratio="16/9"
                                             sx={{
@@ -346,7 +347,7 @@ export default function MostPopularRecipe(): JSX.Element {
                                             }}
                                         >
                                             <img
-                                                src={recipe.image}
+                                                src={recipe.thumbnail}
                                                 alt={recipe.name || 'Recipe'}
                                                 loading="lazy"
                                             />
