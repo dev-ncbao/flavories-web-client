@@ -54,7 +54,7 @@ export default function NavBar(): JSX.Element {
 
     useEffect(() => {
         const path = location.pathname;
-
+        console.log('Current path:', path);
         if (matchPath('/', path)) {
             setIndex(0);
         } else if (matchPath('/recipe/*', path)) {
@@ -62,8 +62,7 @@ export default function NavBar(): JSX.Element {
         } else if (matchPath('/community/*', path)) {
             setIndex(2);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [location.pathname]);
 
     useEffect(() => {
         if (localStorage.getItem('token')) {

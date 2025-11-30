@@ -14,16 +14,19 @@ import {
     Textarea,
     CircularProgress,
     AspectRatio,
-    Link
+    Link,
+    useTheme
 } from '@mui/joy';
 import {
     ArrowLeft,
     ThumbsUp,
+    ThumbsDown,
     Eye,
     MessageCircle,
     Star,
     Calendar,
-    ChevronLeft
+    ChevronLeft,
+    MessageSquareText
 } from 'lucide-react';
 import { recipeService } from '../../services/recipe/recipe.service';
 import type { RecipeDto } from '../../services/recipe/recipe.dto';
@@ -38,6 +41,7 @@ import 'swiper/css/pagination';
 export default function RecipeDetail(): JSX.Element {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const theme = useTheme();
     const [recipe, setRecipe] = useState<RecipeDto | null>(null);
     const [media, setMedia] = useState<RecipeMediaDto[]>([]);
     const [comments, setComments] = useState<CommentDto[]>([]);
@@ -192,97 +196,313 @@ export default function RecipeDetail(): JSX.Element {
                 <Box height={16} />
                 <Stack spacing={4}>
                     {/* Recipe Header */}
-                    <Card>
-                        <CardContent>
-                            <Stack spacing={2}>
-                                <Typography level="h2">
-                                    {recipe.name}
-                                </Typography>
-                                {/* Stats Row */}
+                    <Card
+                        variant="outlined"
+                        sx={{
+                            borderRadius: 24,
+                            overflow: 'hidden'
+                        }}
+                    >
+                        <CardContent sx={{ p: 0 }}>
+                            <Stack
+                                direction={{ xs: 'column', md: 'row' }}
+                                spacing={0}
+                            >
+                                {/* Left Column - Image */}
+                                {recipe.thumbnail && (
+                                    <Box
+                                        sx={{
+                                            width: { xs: '100%', md: '45%' },
+                                            flexShrink: 0
+                                        }}
+                                    >
+                                        <AspectRatio
+                                            ratio="4/3"
+                                            sx={{
+                                                borderRadius:
+                                                    theme.vars.radius.lg
+                                            }}
+                                        >
+                                            <img
+                                                src={recipe.thumbnail}
+                                                alt={recipe.name || 'Recipe'}
+                                                style={{
+                                                    objectFit: 'cover',
+                                                    width: '100%',
+                                                    height: '100%'
+                                                }}
+                                            />
+                                        </AspectRatio>
+                                    </Box>
+                                )}
+
+                                {/* Right Column - Details */}
                                 <Stack
-                                    direction="row"
                                     spacing={2}
-                                    flexWrap="wrap"
-                                    alignItems="center"
+                                    sx={{
+                                        flex: 1,
+                                        p: 3
+                                    }}
                                 >
-                                    {recipe.rating !== undefined && (
-                                        <Chip
-                                            startDecorator={<Star size={16} />}
-                                            color="warning"
-                                            variant="soft"
-                                        >
-                                            {Number(recipe.rating).toFixed(1)}
-                                        </Chip>
-                                    )}
-                                    {recipe.viewCount !== undefined && (
-                                        <Chip
-                                            startDecorator={<Eye size={16} />}
-                                            variant="soft"
-                                        >
-                                            {recipe.viewCount} views
-                                        </Chip>
-                                    )}
-                                    {recipe.likeCount !== undefined && (
-                                        <Chip
-                                            startDecorator={
-                                                <ThumbsUp size={16} />
-                                            }
-                                            color="success"
-                                            variant="soft"
-                                        >
-                                            {recipe.likeCount}
-                                        </Chip>
-                                    )}
-                                    {recipe.commentCount !== undefined && (
-                                        <Chip
-                                            startDecorator={
-                                                <MessageCircle size={16} />
-                                            }
-                                            variant="soft"
-                                        >
-                                            {recipe.commentCount} comments
-                                        </Chip>
-                                    )}
-                                    {recipe.trendingScore !== undefined && (
-                                        <Chip
-                                            color="danger"
-                                            variant="soft"
-                                        >
-                                            🔥{' '}
-                                            {Number(
-                                                recipe.trendingScore
-                                            ).toFixed(0)}
-                                        </Chip>
-                                    )}
-                                </Stack>
-                                {/* Date */}
-                                {recipe.createdAt && (
+                                    <Typography level="h2">
+                                        {recipe.name}
+                                    </Typography>
+                                    
+                                    {/* Metadata Chips */}
                                     <Stack
                                         direction="row"
                                         spacing={1}
                                         alignItems="center"
+                                        flexWrap="wrap"
                                     >
-                                        <Calendar size={16} />
-                                        <Typography
-                                            level="body-sm"
-                                            textColor="text.secondary"
-                                        >
-                                            {formatDate(recipe.createdAt)}
-                                        </Typography>
+                                        {/* Creation Date */}
+                                        {recipe.createdAt && (
+                                            <Chip
+                                                variant="soft"
+                                                color="neutral"
+                                                startDecorator={
+                                                    <Calendar size={14} />
+                                                }
+                                            >
+                                                {formatDate(
+                                                    recipe.createdAt
+                                                )}
+                                            </Chip>
+                                        )}
+                                        {/* View Count */}
+                                        {recipe.viewCount !== undefined && (
+                                            <Chip
+                                                variant="soft"
+                                                color="neutral"
+                                                startDecorator={
+                                                    <Eye size={14} />
+                                                }
+                                            >
+                                                {recipe.viewCount}
+                                            </Chip>
+                                        )}
+                                        {/* Trending Score */}
+                                        {recipe.trendingScore !==
+                                            undefined && (
+                                            <Chip
+                                                variant="soft"
+                                                color="danger"
+                                            >
+                                                🔥{' '}
+                                                {Number(
+                                                    recipe.trendingScore
+                                                ).toFixed(0)}
+                                            </Chip>
+                                        )}
                                     </Stack>
-                                )}
-                                {/* Description */}
-                                {recipe.description && (
-                                    <Typography
-                                        level="body-lg"
-                                        sx={{ mt: 2 }}
+
+                                    {/* Stats Row */}
+                                    <Stack
+                                        direction="row"
+                                        spacing={3}
+                                        flexWrap="wrap"
+                                        alignItems="center"
                                     >
-                                        {recipe.description}
-                                    </Typography>
-                                )}
+                                        {/* Rating */}
+                                        {recipe.rating !== undefined && (
+                                            <Stack
+                                                direction="row"
+                                                spacing={0.5}
+                                                alignItems="center"
+                                            >
+                                                <Star
+                                                    size={18}
+                                                    fill={
+                                                        theme.vars.palette
+                                                            .yellow[400]
+                                                    }
+                                                    color={
+                                                        theme.vars.palette
+                                                            .yellow[400]
+                                                    }
+                                                />
+                                                <Typography
+                                                    level="body-md"
+                                                    fontWeight={600}
+                                                >
+                                                    {Number(
+                                                        recipe.rating
+                                                    ).toFixed(1)}
+                                                </Typography>
+                                            </Stack>
+                                        )}
+
+                                        {/* Like */}
+                                        {recipe.likeCount !== undefined && (
+                                            <Stack
+                                                direction="row"
+                                                spacing={0.5}
+                                                alignItems="center"
+                                            >
+                                                <ThumbsUp
+                                                    size={18}
+                                                    color={
+                                                        theme.vars.palette
+                                                            .green[500]
+                                                    }
+                                                />
+                                                <Typography
+                                                    level="body-md"
+                                                    fontWeight={600}
+                                                >
+                                                    {recipe.likeCount}
+                                                </Typography>
+                                            </Stack>
+                                        )}
+
+                                        {/* Dislike */}
+                                        {recipe.dislikeCount !== undefined && (
+                                            <Stack
+                                                direction="row"
+                                                spacing={0.5}
+                                                alignItems="center"
+                                            >
+                                                <ThumbsDown
+                                                    size={18}
+                                                    color={
+                                                        theme.vars.palette
+                                                            .red[500]
+                                                    }
+                                                />
+                                                <Typography
+                                                    level="body-md"
+                                                    fontWeight={600}
+                                                >
+                                                    {recipe.dislikeCount}
+                                                </Typography>
+                                            </Stack>
+                                        )}
+
+                                        {/* Comment Count */}
+                                        {recipe.commentCount !== undefined && (
+                                            <Stack
+                                                direction="row"
+                                                spacing={0.5}
+                                                alignItems="center"
+                                            >
+                                                <MessageSquareText
+                                                    size={18}
+                                                    color={
+                                                        theme.vars.palette
+                                                            .purple[500]
+                                                    }
+                                                />
+                                                <Typography
+                                                    level="body-md"
+                                                    fontWeight={600}
+                                                >
+                                                    {recipe.commentCount}
+                                                </Typography>
+                                            </Stack>
+                                        )}
+                                    </Stack>
+
+                                    {/* Description */}
+                                    {recipe.description && (
+                                        <Typography
+                                            level="body-md"
+                                            sx={{
+                                                color: theme.vars.palette
+                                                    .neutral[600],
+                                                lineHeight: 1.6
+                                            }}
+                                        >
+                                            {recipe.description}
+                                        </Typography>
+                                    )}
+                                </Stack>
                             </Stack>
                         </CardContent>
                     </Card>
+
+                    {/* Ingredients Section */}
+                    <Card
+                        variant="outlined"
+                        sx={{
+                            borderRadius: 24
+                        }}
+                    >
+                        <CardContent sx={{ p: 3 }}>
+                            <Typography
+                                level="h3"
+                                sx={{ mb: 2 }}
+                            >
+                                Ingredients
+                            </Typography>
+                            
+                            {/* TODO: Replace with actual ingredients data */}
+                            <Stack spacing={1.5}>
+                                <Stack
+                                    direction="row"
+                                    spacing={2}
+                                    alignItems="center"
+                                >
+                                    <Box
+                                        sx={{
+                                            width: 8,
+                                            height: 8,
+                                            borderRadius: '50%',
+                                            bgcolor: theme.vars.palette.primary[500]
+                                        }}
+                                    />
+                                    <Typography level="body-md">
+                                        Sample ingredient 1
+                                    </Typography>
+                                </Stack>
+                                <Stack
+                                    direction="row"
+                                    spacing={2}
+                                    alignItems="center"
+                                >
+                                    <Box
+                                        sx={{
+                                            width: 8,
+                                            height: 8,
+                                            borderRadius: '50%',
+                                            bgcolor: theme.vars.palette.primary[500]
+                                        }}
+                                    />
+                                    <Typography level="body-md">
+                                        Sample ingredient 2
+                                    </Typography>
+                                </Stack>
+                                <Stack
+                                    direction="row"
+                                    spacing={2}
+                                    alignItems="center"
+                                >
+                                    <Box
+                                        sx={{
+                                            width: 8,
+                                            height: 8,
+                                            borderRadius: '50%',
+                                            bgcolor: theme.vars.palette.primary[500]
+                                        }}
+                                    />
+                                    <Typography level="body-md">
+                                        Sample ingredient 3
+                                    </Typography>
+                                </Stack>
+                            </Stack>
+                            
+                            <Typography
+                                level="body-sm"
+                                sx={{
+                                    mt: 2,
+                                    color: theme.vars.palette.neutral[500],
+                                    fontStyle: 'italic'
+                                }}
+                            >
+                                Note: Connect this section to your ingredients API endpoint
+                            </Typography>
+                        </CardContent>
+                    </Card>
+
                     {/* Media Gallery */}
                     {media.length > 0 && (
                         <Card>
@@ -306,7 +526,7 @@ export default function RecipeDetail(): JSX.Element {
                                         pagination={{ clickable: true }}
                                         spaceBetween={20}
                                         slidesPerView={1}
-                                        style={{ 
+                                        style={{
                                             borderRadius: '8px',
                                             width: '100%'
                                         }}
@@ -315,14 +535,19 @@ export default function RecipeDetail(): JSX.Element {
                                             <SwiperSlide
                                                 key={mediaItem.id || index}
                                             >
-                                                <AspectRatio 
+                                                <AspectRatio
                                                     ratio="16/9"
                                                     sx={{
                                                         width: '100%',
-                                                        minHeight: { xs: '250px', sm: '400px', md: '500px' }
+                                                        minHeight: {
+                                                            xs: '250px',
+                                                            sm: '400px',
+                                                            md: '500px'
+                                                        }
                                                     }}
                                                 >
-                                                    {mediaItem.mediaTypeId === 1 ? (
+                                                    {mediaItem.mediaTypeId ===
+                                                    1 ? (
                                                         <img
                                                             src={mediaItem.url}
                                                             alt={
@@ -330,7 +555,8 @@ export default function RecipeDetail(): JSX.Element {
                                                                 `Recipe image ${index + 1}`
                                                             }
                                                             style={{
-                                                                objectFit: 'cover',
+                                                                objectFit:
+                                                                    'cover',
                                                                 width: '100%',
                                                                 height: '100%'
                                                             }}
@@ -362,8 +588,8 @@ export default function RecipeDetail(): JSX.Element {
                                                             bgcolor="background.level1"
                                                         >
                                                             <Typography>
-                                                                Unsupported media
-                                                                type
+                                                                Unsupported
+                                                                media type
                                                             </Typography>
                                                         </Box>
                                                     )}

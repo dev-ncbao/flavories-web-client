@@ -1,8 +1,10 @@
 import { Box, Button, Stack, Typography, useTheme } from '@mui/joy';
 import type { JSX } from 'react';
+import { useNavigate } from 'react-router';
 
 export default function HeroSection(): JSX.Element {
     const theme = useTheme();
+    const navigate = useNavigate();
 
     return (
         <Stack
@@ -48,6 +50,7 @@ export default function HeroSection(): JSX.Element {
                         paddingX: 4,
                         borderRadius: theme.vars.radius.lg
                     }}
+                    onClick={() => navigate('/recipe/1')}
                 >
                     Explore Recipes
                 </Button>
