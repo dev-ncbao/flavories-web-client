@@ -1,4 +1,4 @@
-import { type JSX, useEffect, useState } from 'react';
+import { type JSX, useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import {
     Box,
@@ -7,7 +7,6 @@ import {
     Card,
     CardContent,
     Chip,
-    IconButton,
     Avatar,
     Divider,
     Button,
@@ -15,18 +14,18 @@ import {
     CircularProgress,
     AspectRatio,
     Link,
-    useTheme
+    useTheme,
+    Alert
 } from '@mui/joy';
 import {
-    ArrowLeft,
     ThumbsUp,
     ThumbsDown,
     Eye,
-    MessageCircle,
     Star,
     Calendar,
     ChevronLeft,
-    MessageSquareText
+    MessageSquareText,
+    Info
 } from 'lucide-react';
 import { recipeService } from '../../services/recipe/recipe.service';
 import type { RecipeDto } from '../../services/recipe/recipe.dto';
@@ -47,20 +46,16 @@ export default function RecipeDetail(): JSX.Element {
     const [comments, setComments] = useState<CommentDto[]>([]);
     const [allComments, setAllComments] = useState<CommentDto[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [commentText, setCommentText] = useState('');
     const [commentsPage, setCommentsPage] = useState(1);
     const [hasMoreComments, setHasMoreComments] = useState(true);
 
-    useEffect(() => {
-        if (id) {
-            loadRecipeData();
-        }
-    }, [id]);
-
-    const loadRecipeData = async () => {
+    const loadRecipeData = useCallback(async () => {
         if (!id) return;
 
         setLoading(true);
+        setError(null);
         try {
             const recipeId = parseInt(id);
 
@@ -90,12 +85,19 @@ export default function RecipeDetail(): JSX.Element {
             );
             setComments(parentComments.slice(0, 10));
             setHasMoreComments(parentComments.length > 10);
-        } catch (error) {
-            console.error('Failed to load recipe data:', error);
+        } catch (err) {
+            console.error('Failed to load recipe data:', err);
+            setError('Failed to load recipe details. Please try again later.');
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
+
+    useEffect(() => {
+        if (id) {
+            loadRecipeData();
+        }
+    }, [id, loadRecipeData]);
 
     const loadMoreComments = () => {
         const parentComments = allComments.filter((c) => c.parentId === null);
@@ -144,17 +146,64 @@ export default function RecipeDetail(): JSX.Element {
         );
     }
 
-    if (!recipe) {
+    if (error) {
         return (
-            <Box p={4}>
-                <Typography level="h3">Recipe not found</Typography>
-                <Button
-                    onClick={handleBack}
-                    sx={{ mt: 2 }}
+            <Stack
+                spacing={3}
+                alignItems="center"
+                justifyContent="center"
+                minHeight="60vh"
+                p={4}
+            >
+                <Alert
+                    color="danger"
+                    variant="soft"
+                    startDecorator={<Info />}
+                    sx={{ maxWidth: 500 }}
                 >
+                    <Stack spacing={1}>
+                        <Typography level="title-md" color="danger">
+                            Error Loading Recipe
+                        </Typography>
+                        <Typography level="body-sm">{error}</Typography>
+                    </Stack>
+                </Alert>
+                <Button onClick={handleBack} variant="outlined">
                     Go Back
                 </Button>
-            </Box>
+            </Stack>
+        );
+    }
+
+    if (!recipe) {
+        return (
+            <Stack
+                spacing={3}
+                alignItems="center"
+                justifyContent="center"
+                minHeight="60vh"
+                p={4}
+            >
+                <Alert
+                    color="warning"
+                    variant="soft"
+                    startDecorator={<Info />}
+                    sx={{ maxWidth: 500 }}
+                >
+                    <Stack spacing={1}>
+                        <Typography level="title-md" color="warning">
+                            Recipe Not Found
+                        </Typography>
+                        <Typography level="body-sm">
+                            The recipe you're looking for doesn't exist or has
+                            been removed.
+                        </Typography>
+                    </Stack>
+                </Alert>
+                <Button onClick={handleBack} variant="outlined">
+                    Go Back
+                </Button>
+            </Stack>
         );
     }
 
