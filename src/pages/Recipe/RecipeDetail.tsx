@@ -85,6 +85,9 @@ export default function RecipeDetail(): JSX.Element {
             );
             setComments(parentComments.slice(0, 10));
             setHasMoreComments(parentComments.length > 10);
+
+            // Add 0.5 second delay for loading state
+            await new Promise((resolve) => setTimeout(resolve, 500));
         } catch (err) {
             console.error('Failed to load recipe data:', err);
             setError('Failed to load recipe details. Please try again later.');
