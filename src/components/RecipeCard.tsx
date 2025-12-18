@@ -16,11 +16,13 @@ import {
     Calendar
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import type { RecipeDto } from '../services/recipe/recipe.dto';
+import type { RecipeDto, Recipe } from '../services/recipe/recipe.dto';
 import type { JSX } from 'react';
 
+type RecipeLike = RecipeDto | Recipe;
+
 interface RecipeCardProps {
-    recipe: RecipeDto;
+    recipe: RecipeLike;
     showRank?: boolean;
     rank?: number;
 }
@@ -32,6 +34,22 @@ export default function RecipeCard({
 }: RecipeCardProps): JSX.Element {
     const theme = useTheme();
     const navigate = useNavigate();
+
+    const recipeId =
+        ('recipeId' in recipe ? recipe.recipeId : undefined) ??
+        ('id' in recipe ? recipe.id : undefined);
+    const thumbnail =
+        'thumbnailUrl' in recipe
+            ? recipe.thumbnailUrl
+            : 'thumbnail' in recipe
+              ? recipe.thumbnail
+              : undefined;
+    const rating =
+        ('rating' in recipe ? recipe.rating : undefined) ??
+        ('hotRating' in recipe ? Number(recipe.hotRating) : undefined);
+    const likeCount = 'likeCount' in recipe ? recipe.likeCount : undefined;
+    const dislikeCount = 'dislikeCount' in recipe ? recipe.dislikeCount : undefined;
+    const commentCount = 'commentCount' in recipe ? recipe.commentCount : undefined;
 
     const formatDate = (date?: Date) => {
         if (!date) return 'Unknown';
@@ -45,7 +63,11 @@ export default function RecipeCard({
     return (
         <Card
             variant="outlined"
-            onClick={() => navigate(`/recipe/${recipe.id}`)}
+            onClick={() => {
+                if (recipeId !== undefined) {
+                    navigate(`/recipe/${recipeId}`);
+                }
+            }}
             sx={{
                 height: '100%',
                 cursor: 'pointer',
@@ -58,7 +80,7 @@ export default function RecipeCard({
                 }
             }}
         >
-            {recipe.thumbnail && (
+            {thumbnail && (
                 <AspectRatio
                     ratio="16/9"
                     sx={{
@@ -66,7 +88,7 @@ export default function RecipeCard({
                     }}
                 >
                     <img
-                        src={recipe.thumbnail}
+                        src={thumbnail}
                         alt={recipe.name || 'Recipe'}
                         loading="lazy"
                     />
@@ -169,7 +191,7 @@ export default function RecipeCard({
                             level="body-sm"
                             fontWeight={600}
                         >
-                            {recipe.rating ? Number(recipe.rating).toFixed(1) : '0.0'}
+                            {rating !== undefined ? Number(rating).toFixed(1) : '0.0'}
                         </Typography>
                     </Stack>
 
@@ -187,7 +209,7 @@ export default function RecipeCard({
                             level="body-sm"
                             fontWeight={600}
                         >
-                            {recipe.likeCount || 0}
+                            {likeCount ?? 0}
                         </Typography>
                     </Stack>
 
@@ -205,7 +227,7 @@ export default function RecipeCard({
                             level="body-sm"
                             fontWeight={600}
                         >
-                            {recipe.dislikeCount || 0}
+                            {dislikeCount ?? 0}
                         </Typography>
                     </Stack>
 
@@ -241,7 +263,7 @@ export default function RecipeCard({
                             level="body-sm"
                             fontWeight={600}
                         >
-                            {recipe.commentCount || 0}
+                            {commentCount ?? 0}
                         </Typography>
                     </Stack>
                 </Stack>

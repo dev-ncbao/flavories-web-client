@@ -25,7 +25,15 @@ export default function TrendingRecipe(): JSX.Element {
     // Calculate current month date range
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    const endOfMonth = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999
+    );
 
     const isEmpty = useMemo(
         () => !loading && !error && recipes.length === 0,
@@ -46,14 +54,8 @@ export default function TrendingRecipe(): JSX.Element {
         const fetchRecipes = async () => {
             try {
                 setLoading(true);
-                
-                const response = await recipeService.getRecipes({
-                    limit: 20,
-                    sortBy: 'trendingScore',
-                    sortOrder: 'DESC',
-                    startDate: startOfMonth.toISOString(),
-                    endDate: endOfMonth.toISOString()
-                });
+
+                const response = await recipeService.getTopThisMonth(20);
 
                 // Add 0.5 second delay for loading state
                 await new Promise((resolve) => setTimeout(resolve, 500));
@@ -107,20 +109,26 @@ export default function TrendingRecipe(): JSX.Element {
                         variant="outlined"
                         color="neutral"
                         startDecorator={<List size={18} />}
-                        onClick={() => navigate('/recipe/discovery', {
-                            state: {
-                                startDate: startOfMonth.toISOString().split('T')[0],
-                                endDate: endOfMonth.toISOString().split('T')[0],
-                                sortBy: 'trendingScore',
-                                sortOrder: 'DESC',
-                                showFilters: true
-                            }
-                        })}
+                        onClick={() =>
+                            navigate('/recipe/discovery', {
+                                state: {
+                                    startDate: startOfMonth
+                                        .toISOString()
+                                        .split('T')[0],
+                                    endDate: endOfMonth
+                                        .toISOString()
+                                        .split('T')[0],
+                                    sortBy: 'trendingScore',
+                                    sortOrder: 'DESC',
+                                    showFilters: true
+                                }
+                            })
+                        }
                         sx={{
                             borderRadius: theme.vars.radius.lg
                         }}
                     >
-                        See All Trending Recipes This Month
+                        View All Trending Recipes This Month
                     </Button>
                 </Stack>
 
@@ -203,7 +211,12 @@ export default function TrendingRecipe(): JSX.Element {
                     </Alert>
                 )}
 
-                {hasRecipes && <RecipeCarousel recipes={recipes} showRank />}
+                {hasRecipes && (
+                    <RecipeCarousel
+                        recipes={recipes}
+                        showRank
+                    />
+                )}
             </Stack>
         </Stack>
     );

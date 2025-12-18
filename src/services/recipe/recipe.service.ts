@@ -43,5 +43,23 @@ export const recipeService = {
         return axiosClient.get<RecipeMediaDto[]>(
             `/recipe-media/recipe/${recipeId}`
         );
+    },
+    // Get top recipes for the current month
+    getTopThisMonth: (limit = 20) => {
+        return axiosClient.get<RecipeDto[]>('/recipes/top-month', {
+            params: { limit }
+        });
+    },
+    // Get newest recipes for the current month
+    getNewestThisMonth: (limit = 20) => {
+        return axiosClient.get<RecipeDto[]>('/recipes/new-month', {
+            params: { limit }
+        });
+    },
+    // Get hottest recipes of all time
+    getHotAllTime: (limit = 20) => {
+        return axiosClient.get<RecipeDto[]>('/recipes/hot-all', {
+            params: { limit }
+        });
     }
 };

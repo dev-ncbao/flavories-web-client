@@ -4,14 +4,16 @@ import { useRef, useState, type JSX } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
-import type { RecipeDto } from '../services/recipe/recipe.dto';
+import type { RecipeDto, Recipe } from '../services/recipe/recipe.dto';
 import RecipeCard from './RecipeCard';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+type RecipeLike = RecipeDto | Recipe;
+
 interface RecipeCarouselProps {
-    recipes: RecipeDto[];
+    recipes: RecipeLike[];
     showRank?: boolean;
 }
 
@@ -139,7 +141,15 @@ export default function RecipeCarousel({
                 }}
             >
                 {recipes.map((recipe, index) => (
-                    <SwiperSlide key={recipe.id}>
+                    <SwiperSlide
+                        key={
+                            'recipeId' in recipe && recipe.recipeId !== undefined
+                                ? recipe.recipeId
+                                : 'id' in recipe && recipe.id !== undefined
+                                  ? recipe.id
+                                  : index
+                        }
+                    >
                         <RecipeCard
                             recipe={recipe}
                             showRank={showRank}

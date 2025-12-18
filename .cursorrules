@@ -1,0 +1,40 @@
+# Cursor Rules for Flavories Web Client
+
+## Project context
+- React 19 + TypeScript (strict) with Vite; Joy UI is the primary component library.
+- Theme and tokens live in `src/theme.ts`; keep colors/radii/typography sourced from `theme.vars` and Joy tokens rather than hardcoded values.
+- Routing is defined in `src/routes/routes.tsx` and rendered via `AppRoutes`; `App` provides the fixed top nav and spacer offset — preserve this structure when adding pages.
+- Global providers: `CssVarsProvider` + `CssBaseline`, `SnackbarProvider` (`useSnackbar` for toasts). Prefer these over ad‑hoc implementations.
+- HTTP goes through `src/api/axiosClient.ts` (adds Bearer token from `localStorage`) and service wrappers in `src/services/**`. Reuse/extend services instead of calling `axios` directly.
+
+## Code style
+- Use functional components with explicit return types (`JSX.Element`); keep hooks at the top level, name custom hooks with `use*`.
+- Favor `import type` for type‑only imports; avoid `any` and keep DTO types in `services/*/*.dto.ts` as the source of truth.
+- Prefer Joy components and the `sx` prop for styling; keep spacing, radii, and colors aligned to the theme (`theme.vars.radius.*`, palette keys).
+- Keep components small and focused; extract reusable UI into `src/components/` and shared logic into hooks/contexts.
+- Handle errors gracefully (user‑facing feedback via `SnackbarProvider` or Joy `Alert`); don’t swallow async errors.
+
+## UI / UX guidance
+- Maintain the existing visual language: generous padding, rounded corners, soft shadows, and the orange/green brand accents from the theme palette.
+- Default to accessible Joy variants (`variant="soft/solid/plain"`) and set `aria` labels when icons stand alone; ensure inputs/buttons remain keyboard navigable.
+- Keep layouts responsive: use `Stack`, `Box`, and flex utilities; avoid fixed widths except where required (e.g., navbar height offset).
+- Provide meaningful alt text for images (logo, recipe thumbnails, avatars fallback).
+- Favor clear CTAs and inline validation messages; surface feedback via snackbars for transient events.
+
+## Data & services
+- Base API URL comes from `VITE_API_BASE_URL`; keep all calls relative and centralized through services.
+- Auth token is stored in `localStorage` as `token`; preserve this contract when updating auth flows.
+- When adding new endpoints, extend existing service modules and co‑locate request/response DTOs.
+
+## Tooling & commands
+- Package manager: `bun` preferred (lockfile present); `bun install`, `bun run dev`, `bun run lint`. If bun is unavailable, fall back to npm without changing lockfiles.
+- Run `bun run lint` before shipping significant changes; format with Prettier defaults (no extra config present).
+
+## Testing & quality
+- No test suite yet; for new logic that’s complex, add lightweight unit/logic tests if infra allows, otherwise keep functions small and predictable.
+- Watch for strict TypeScript warnings (`noUnused*`, `noFallthrough`, etc.) and fix at the source.
+
+## Miscellaneous
+- Keep new files ASCII; follow existing casing conventions (PascalCase components, camelCase utilities).
+- Avoid introducing new global styles when a Joy token can handle it. If you must add globals, do so via `GlobalStyles` in `src/main.tsx`.
+
