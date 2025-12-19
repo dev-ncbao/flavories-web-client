@@ -6,12 +6,14 @@ import { CssVarsProvider, CssBaseline, GlobalStyles } from '@mui/joy';
 import { theme } from './theme.ts';
 import AppRoutes from './routes/AppRoutes.tsx';
 import { SnackbarProvider } from './components/SnackbarProvider.tsx';
+import { AuthProvider } from './components/AuthProvider.tsx';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
             <CssVarsProvider theme={theme}>
-                <SnackbarProvider>
+                <AuthProvider>
+                    <SnackbarProvider>
                     {/* must be used under CssVarsProvider */}
                     <CssBaseline />
                     <GlobalStyles
@@ -38,7 +40,8 @@ createRoot(document.getElementById('root')!).render(
                     />
                     {/* The rest of your application */}
                     <AppRoutes />
-                </SnackbarProvider>
+                    </SnackbarProvider>
+                </AuthProvider>
             </CssVarsProvider>
         </BrowserRouter>
     </StrictMode>

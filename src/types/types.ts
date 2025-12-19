@@ -59,3 +59,27 @@ export interface RecipeComment {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface RecipeSteps {
+    recipeStepId: number;
+    recipeId: number;
+    stepNumber: number;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface Course {
+    courseId: number;
+    userId: number;
+    name: string;
+    description: string;
+    rating: number;
+    viewCount: number;
+    commentCount: number;
+    thumbnailUrl: string;
+    videoUrl: string;
+    linkedRecipeId?: number;
+    createdAt: Date;
+    updatedAt: Date;
+}

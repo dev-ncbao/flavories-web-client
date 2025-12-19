@@ -1,7 +1,7 @@
 import App from '../App';
 import SignIn from '../pages/Authentication/SignIn';
 import SignUp from '../pages/Authentication/SignUp';
-import Community from '../pages/Community';
+import CourseSummary from '../pages/CourseSummary/CourseSummary';
 import LandingPage from '../pages/LandingPage/LandingPage';
 import NotFound from '../pages/NotFound';
 import RecipeSummary from '../pages/RecipeSummary/RecipeSummary';
@@ -17,7 +17,8 @@ export const appRoutes = [
             { path: 'recipe/summary', element: <RecipeSummary /> },
             { path: 'recipe/discovery', element: <RecipeDiscovery /> },
             { path: 'recipe/:id/detail', element: <RecipeDetail /> },
-            { path: 'community', element: <Community /> }
+            // { path: 'course', element: <Community /> }
+            { path: 'course/summary', element: <CourseSummary /> }
         ]
     },
     { path: '/sign-in', element: <SignIn /> },

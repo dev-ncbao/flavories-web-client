@@ -1,5 +1,5 @@
 import axiosClient from '../../api/axiosClient';
-import type { RecipeDto } from './recipe.dto';
+import type { PostCommentRequest, RecipeDto } from './recipe.dto';
 
 export interface RecipeQueryParams {
     limit?: number;
@@ -47,5 +47,8 @@ export const recipeService = {
         return axiosClient.get<RecipeDto[]>('/recipes/hot-all', {
             params: { limit }
         });
+    },
+    postComment: (data: PostCommentRequest) => {
+        return axiosClient.post<PostCommentRequest>('/recipe-comments', data);
     }
 };

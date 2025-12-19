@@ -16,12 +16,101 @@ import {
     MessageSquareText,
     ThumbsDown
 } from 'lucide-react';
-import type { JSX } from 'react';
+import { useState, useEffect, type JSX } from 'react';
 import type { RecipeDto } from '../../services/recipe/recipe.dto';
 import { formatDate } from '../../utils/dateUtils';
+import { useAuth } from '../../hooks/useAuth';
+import { useSnackbar } from '../../hooks/useSnackbar';
 
-export function RecipeHeroCard({ recipe }: { recipe: RecipeDto }): JSX.Element {
+export function RecipeHeroCard({
+    recipe,
+    onLikeDislikeChange,
+    onCommentClick
+}: {
+    recipe: RecipeDto;
+    onLikeDislikeChange?: () => void;
+    onCommentClick?: () => void;
+}): JSX.Element {
     const theme = useTheme();
+    const { isLoggedIn } = useAuth();
+    const { openSnackbar } = useSnackbar();
+    const [userReaction, setUserReaction] = useState<'liked' | 'disliked' | null>(null);
+    const [localLikeCount, setLocalLikeCount] = useState(recipe.likeCount);
+    const [localDislikeCount, setLocalDislikeCount] = useState(recipe.dislikeCount);
+
+    // Sync local state with recipe data when it changes
+    useEffect(() => {
+        setLocalLikeCount(recipe.likeCount);
+        setLocalDislikeCount(recipe.dislikeCount);
+        // TODO: Set userReaction based on recipe data if backend provides this info
+        // For now, we'll track it locally
+    }, [recipe.likeCount, recipe.dislikeCount]);
+
+    const handleLike = async () => {
+        if (!isLoggedIn) {
+            openSnackbar('Please sign in to like recipes', 'warning');
+            return;
+        }
+
+        try {
+            // TODO: Replace with actual API call when service is available
+            // await recipeService.likeRecipe(recipe.recipeId);
+            
+            if (userReaction === 'liked') {
+                // If already liked, remove like
+                setUserReaction(null);
+                setLocalLikeCount((prev) => Math.max(0, prev - 1));
+            } else {
+                // If disliked, switch to liked
+                const wasDisliked = userReaction === 'disliked';
+                setUserReaction('liked');
+                setLocalLikeCount((prev) => prev + 1);
+                if (wasDisliked) {
+                    setLocalDislikeCount((prev) => Math.max(0, prev - 1));
+                }
+            }
+            
+            // Callback to refresh recipe data
+            if (onLikeDislikeChange) {
+                onLikeDislikeChange();
+            }
+        } catch {
+            openSnackbar('Failed to update like. Please try again.', 'danger');
+        }
+    };
+
+    const handleDislike = async () => {
+        if (!isLoggedIn) {
+            openSnackbar('Please sign in to dislike recipes', 'warning');
+            return;
+        }
+
+        try {
+            // TODO: Replace with actual API call when service is available
+            // await recipeService.dislikeRecipe(recipe.recipeId);
+            
+            if (userReaction === 'disliked') {
+                // If already disliked, remove dislike
+                setUserReaction(null);
+                setLocalDislikeCount((prev) => Math.max(0, prev - 1));
+            } else {
+                // If liked, switch to disliked
+                const wasLiked = userReaction === 'liked';
+                setUserReaction('disliked');
+                setLocalDislikeCount((prev) => prev + 1);
+                if (wasLiked) {
+                    setLocalLikeCount((prev) => Math.max(0, prev - 1));
+                }
+            }
+            
+            // Callback to refresh recipe data
+            if (onLikeDislikeChange) {
+                onLikeDislikeChange();
+            }
+        } catch {
+            openSnackbar('Failed to update dislike. Please try again.', 'danger');
+        }
+    };
 
     return (
         <Card
@@ -151,51 +240,85 @@ export function RecipeHeroCard({ recipe }: { recipe: RecipeDto }): JSX.Element {
                                     {recipe.viewCount} views
                                 </Chip>
                                 <Button
-                                    onClick={() => {
-                                        console.log('like');
-                                    }}
+                                    onClick={handleLike}
                                     variant="plain"
                                     size="md"
+                                    disabled={userReaction === 'disliked'}
                                     startDecorator={<ThumbsUp size={16} />}
                                     sx={{
                                         borderRadius: theme.vars.radius.lg,
                                         fontWeight: 500,
                                         px: 1.5,
                                         py: 0.75,
-                                        color: theme.vars.palette.gray[700],
-                                        backgroundColor: '#ededed',
+                                        color:
+                                            userReaction === 'liked'
+                                                ? theme.vars.palette.success[700]
+                                                : theme.vars.palette.gray[700],
+                                        backgroundColor:
+                                            userReaction === 'liked'
+                                                ? theme.vars.palette.success[100]
+                                                : '#ededed',
                                         '&:hover': {
-                                            backgroundColor: '#e0e0e0'
+                                            backgroundColor:
+                                                userReaction === 'liked'
+                                                    ? theme.vars.palette.success[200]
+                                                    : '#e0e0e0'
                                         },
                                         '&:active': {
-                                            backgroundColor: '#ededed'
+                                            backgroundColor:
+                                                userReaction === 'liked'
+                                                    ? theme.vars.palette.success[100]
+                                                    : '#ededed'
+                                        },
+                                        '&:disabled': {
+                                            opacity: 0.5,
+                                            cursor: 'not-allowed'
                                         }
                                     }}
                                 >
-                                    {recipe.likeCount} likes
+                                    {localLikeCount} likes
                                 </Button>
                                 <Button
+                                    onClick={handleDislike}
                                     variant="plain"
                                     size="md"
+                                    disabled={userReaction === 'liked'}
                                     startDecorator={<ThumbsDown size={16} />}
                                     sx={{
                                         borderRadius: theme.vars.radius.lg,
                                         fontWeight: 500,
                                         px: 1.5,
                                         py: 0.75,
-                                        color: theme.vars.palette.gray[700],
-                                        backgroundColor: '#ededed',
+                                        color:
+                                            userReaction === 'disliked'
+                                                ? theme.vars.palette.danger[700]
+                                                : theme.vars.palette.gray[700],
+                                        backgroundColor:
+                                            userReaction === 'disliked'
+                                                ? theme.vars.palette.danger[100]
+                                                : '#ededed',
                                         '&:hover': {
-                                            backgroundColor: '#e0e0e0'
+                                            backgroundColor:
+                                                userReaction === 'disliked'
+                                                    ? theme.vars.palette.danger[200]
+                                                    : '#e0e0e0'
                                         },
                                         '&:active': {
-                                            backgroundColor: '#ededed'
+                                            backgroundColor:
+                                                userReaction === 'disliked'
+                                                    ? theme.vars.palette.danger[100]
+                                                    : '#ededed'
+                                        },
+                                        '&:disabled': {
+                                            opacity: 0.5,
+                                            cursor: 'not-allowed'
                                         }
                                     }}
                                 >
-                                    {recipe.dislikeCount} dislikes
+                                    {localDislikeCount} dislikes
                                 </Button>
                                 <Button
+                                    onClick={onCommentClick}
                                     variant="plain"
                                     size="md"
                                     startDecorator={
@@ -208,6 +331,7 @@ export function RecipeHeroCard({ recipe }: { recipe: RecipeDto }): JSX.Element {
                                         py: 0.75,
                                         color: theme.vars.palette.gray[700],
                                         backgroundColor: '#ededed',
+                                        cursor: 'pointer',
                                         '&:hover': {
                                             backgroundColor: '#e0e0e0'
                                         },

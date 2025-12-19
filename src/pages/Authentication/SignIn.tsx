@@ -15,10 +15,12 @@ import { ChevronLeft, Eye, EyeOff, OctagonAlert, X } from 'lucide-react';
 import { useState, type JSX } from 'react';
 import { useNavigate } from 'react-router';
 import { authService } from '../../services/auth/auth.service';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function SignIn(): JSX.Element {
     const navigate = useNavigate();
     const theme = useTheme();
+    const { refreshAuth } = useAuth();
 
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -209,11 +211,12 @@ export default function SignIn(): JSX.Element {
                         onClick={async () => {
                             await authService
                                 .signIn({ usernameOrEmail, password })
-                                .then(({ data }) => {
+                                .then(async ({ data }) => {
                                     localStorage.setItem(
                                         'token',
                                         data.accessToken
                                     );
+                                    await refreshAuth();
                                     navigate('/');
                                 })
                                 .catch((err) => {

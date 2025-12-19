@@ -20,15 +20,13 @@ import {
 import { ChevronDown, CircleUser, LogOut, Search } from 'lucide-react';
 import { useCallback, useEffect, useState, type JSX } from 'react';
 import { matchPath, useLocation, useNavigate } from 'react-router';
-import { userService } from '../services/user/user.service';
-import type { UserDto } from '../services/user/user.dto';
+import { useAuth } from '../hooks/useAuth';
 
-const routes = ['/', '/recipe/summary', '/community'];
+const routes = ['/', '/recipe/summary', '/course/summary'];
 
 export default function NavBar(): JSX.Element {
     const [index, setIndex] = useState(0);
-    const [user, setUser] = useState<UserDto | null>(null);
-    const [loggedIn, setLoggedIn] = useState(false);
+    const { isLoggedIn, user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
@@ -58,26 +56,10 @@ export default function NavBar(): JSX.Element {
             setIndex(0);
         } else if (matchPath('/recipe/*', path)) {
             setIndex(1);
-        } else if (matchPath('/community/*', path)) {
+        } else if (matchPath('/course/*', path)) {
             setIndex(2);
         }
     }, [location.pathname]);
-
-    useEffect(() => {
-        if (localStorage.getItem('token')) {
-            userService
-                .profile()
-                .then((response) => {
-                    setUser(response.data);
-                    setLoggedIn(true);
-                })
-                .catch(() => {
-                    setLoggedIn(false);
-                });
-        } else {
-            setLoggedIn(false);
-        }
-    }, []);
 
     return (
         <Stack
@@ -149,10 +131,10 @@ export default function NavBar(): JSX.Element {
                             Home
                         </Tab>
                         <Tab color={index === 1 ? 'success' : 'neutral'}>
-                            Recipe
+                            Recipes
                         </Tab>
                         <Tab color={index === 2 ? 'success' : 'neutral'}>
-                            Community
+                            Courses
                         </Tab>
                     </TabList>
                 </Tabs>
@@ -177,7 +159,7 @@ export default function NavBar(): JSX.Element {
                 direction={'row'}
                 alignItems={'center'}
             >
-                {!loggedIn ? (
+                {!isLoggedIn ? (
                     <Button
                         size="lg"
                         startDecorator={<CircleUser />}
@@ -238,8 +220,7 @@ export default function NavBar(): JSX.Element {
                             <MenuItem
                                 color="danger"
                                 onClick={() => {
-                                    localStorage.removeItem('token');
-                                    setLoggedIn(false);
+                                    logout();
                                     navigate('/');
                                 }}
                             >
