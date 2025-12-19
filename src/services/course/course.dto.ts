@@ -5,7 +5,43 @@ export type CourseDto = Course & {
         User,
         'userId' | 'username' | 'avatarUrl' | 'firstName' | 'lastName'
     >;
+    courseComments: CourseCommentDto[];
+    courseIngredients: CourseIngredientDto[];
+    courseSteps: CourseStepDto[];
 };
+
+export interface CourseIngredientDto {
+    amount: string;
+    ingredient: {
+        name: string;
+        unit: {
+            abbreviation: string;
+        };
+    };
+}
+
+export interface CourseStepDto {
+    stepNumber: number;
+    description: string;
+}
+
+export interface CourseCommentDto {
+    courseCommentId: number;
+    comment: string;
+    createdAt: Date;
+    user: {
+        username: string;
+        avatarUrl: string;
+        firstName: string;
+        lastName: string;
+    };
+}
+
+export interface PostCourseCommentRequest {
+    courseId: number;
+    userId: number;
+    comment: string;
+}
 
 export interface CourseQueryParams {
     limit?: number;

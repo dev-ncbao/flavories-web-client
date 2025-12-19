@@ -1,5 +1,9 @@
 import axiosClient from '../../api/axiosClient';
-import type { CourseDto, CourseQueryParams } from './course.dto';
+import type {
+    CourseDto,
+    CourseQueryParams,
+    PostCourseCommentRequest
+} from './course.dto';
 
 export const courseService = {
     // Unified endpoint for all course queries
@@ -29,6 +33,13 @@ export const courseService = {
         return axiosClient.get<CourseDto[]>('/courses/hot-all', {
             params: { limit }
         });
+    },
+    // Post a comment on a course
+    postComment: (data: PostCourseCommentRequest) => {
+        return axiosClient.post<PostCourseCommentRequest>(
+            '/courses-comments',
+            data
+        );
     }
 };
 

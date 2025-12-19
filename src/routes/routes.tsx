@@ -7,6 +7,7 @@ import NotFound from '../pages/NotFound';
 import RecipeSummary from '../pages/RecipeSummary/RecipeSummary';
 import RecipeDiscovery from '../pages/RecipeSummary/RecipeDiscovery';
 import RecipeDetail from '../pages/RecipeDetail/RecipeDetail';
+import CourseDetail from '../pages/CourseDetail/CourseDetail';
 
 export const appRoutes = [
     {
@@ -17,8 +18,8 @@ export const appRoutes = [
             { path: 'recipe/summary', element: <RecipeSummary /> },
             { path: 'recipe/discovery', element: <RecipeDiscovery /> },
             { path: 'recipe/:id/detail', element: <RecipeDetail /> },
-            // { path: 'course', element: <Community /> }
-            { path: 'course/summary', element: <CourseSummary /> }
+            { path: 'course/summary', element: <CourseSummary /> },
+            { path: 'course/:id/detail', element: <CourseDetail /> }
         ]
     },
     { path: '/sign-in', element: <SignIn /> },

@@ -10,11 +10,12 @@ import {
     Chip
 } from '@mui/joy';
 import {
-    ThumbsUp,
-    ThumbsDown,
     Eye,
     Calendar,
-    MessageSquareText
+    MessageSquareText,
+    Play,
+    Star,
+    DollarSign
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
@@ -141,6 +142,36 @@ export default function CourseCard({
                             {formatDate(course.createdAt)}
                         </Typography>
                     </Box>
+
+                    {/* Play Button Overlay - Center */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: { xs: 64, md: 80 },
+                            height: { xs: 64, md: 80 },
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                            backdropFilter: 'blur(10px) saturate(120%)',
+                            WebkitBackdropFilter: 'blur(10px) saturate(120%)',
+                            border: '2px solid rgba(255, 255, 255, 0.3)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            opacity: 0.6
+                        }}
+                    >
+                        <Play
+                            size={32}
+                            color="white"
+                            fill="white"
+                            style={{
+                                marginLeft: '4px' // Slight offset to center the play icon visually
+                            }}
+                        />
+                    </Box>
                 </AspectRatio>
             )}
 
@@ -202,25 +233,15 @@ export default function CourseCard({
                         >
                             <Chip
                                 variant="soft"
-                                startDecorator={<ThumbsUp size={14} />}
+                                startDecorator={<Star size={14} />}
                                 sx={{
                                     borderRadius: theme.vars.radius.lg,
-                                    color: theme.vars.palette.gray[700],
-                                    backgroundColor: '#ededed'
+                                    color: theme.vars.palette.warning[700],
+                                    backgroundColor:
+                                        theme.vars.palette.warning[100]
                                 }}
                             >
-                                {course.likeCount ?? 0}
-                            </Chip>
-                            <Chip
-                                variant="soft"
-                                startDecorator={<ThumbsDown size={14} />}
-                                sx={{
-                                    borderRadius: theme.vars.radius.lg,
-                                    color: theme.vars.palette.gray[700],
-                                    backgroundColor: '#ededed'
-                                }}
-                            >
-                                {course.dislikeCount ?? 0}
+                                {course.rating?.toFixed(1) ?? '0.0'}
                             </Chip>
                             <Chip
                                 variant="soft"
@@ -243,6 +264,20 @@ export default function CourseCard({
                                 }}
                             >
                                 {course.commentCount ?? 0}
+                            </Chip>
+                            <Chip
+                                variant="soft"
+                                startDecorator={<DollarSign size={14} />}
+                                sx={{
+                                    borderRadius: theme.vars.radius.lg,
+                                    color: theme.vars.palette.danger[700],
+                                    backgroundColor:
+                                        theme.vars.palette.danger[100]
+                                }}
+                            >
+                                {course.price
+                                    ? `${course.price.toLocaleString('vi-VN')} VND`
+                                    : '0 VND'}
                             </Chip>
                         </Stack>
                     </Stack>
@@ -267,4 +302,3 @@ export default function CourseCard({
         </Card>
     );
 }
-

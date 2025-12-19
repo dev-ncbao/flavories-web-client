@@ -75,6 +75,7 @@ export interface Course {
     name: string;
     description: string;
     rating: number;
+    price: number;
     viewCount: number;
     commentCount: number;
     thumbnailUrl: string;
