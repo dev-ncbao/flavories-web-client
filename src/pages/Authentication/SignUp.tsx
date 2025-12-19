@@ -18,7 +18,6 @@ import {
     Eye,
     EyeOff,
     OctagonAlert,
-    PartyPopper,
     X
 } from 'lucide-react';
 import { useState, type JSX } from 'react';
@@ -399,9 +398,8 @@ export default function SignUp(): JSX.Element {
                                         })
                                         .then(() => {
                                             snackbar.openSnackbar(
-                                                'Congratulations! Your account has been successfully created. Please sign in to continue.',
-                                                'success',
-                                                <PartyPopper />
+                                                'Congratulations 🎉! Your account has been successfully created. Please sign in to continue.',
+                                                'success'
                                             );
                                             navigate('/sign-in');
                                         })

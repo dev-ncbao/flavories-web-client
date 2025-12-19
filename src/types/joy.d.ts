@@ -24,6 +24,7 @@ declare module '@mui/joy/styles' {
         fuchsia: true;
         pink: true;
         rose: true;
+        stale: true;
     }
 
     interface Palette {
@@ -48,5 +49,6 @@ declare module '@mui/joy/styles' {
         fuchsia: PaletteRange;
         pink: PaletteRange;
         rose: PaletteRange;
+        stale: PaletteRange;
     }
 }

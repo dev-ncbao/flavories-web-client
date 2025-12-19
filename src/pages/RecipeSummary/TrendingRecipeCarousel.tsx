@@ -14,7 +14,7 @@ import { recipeService } from '../../services/recipe/recipe.service';
 import { Info, List } from 'lucide-react';
 import RecipeCarousel from '../../components/RecipeCarousel';
 
-export default function TrendingRecipe(): JSX.Element {
+export default function TrendingRecipeCarousel(): JSX.Element {
     const theme = useTheme();
     const navigate = useNavigate();
 

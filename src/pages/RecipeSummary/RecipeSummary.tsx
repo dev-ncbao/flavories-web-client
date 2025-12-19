@@ -1,16 +1,16 @@
 import { type JSX } from 'react';
 import { Box, Stack } from '@mui/joy';
-import TrendingRecipe from './TrendingRecipe';
-import NewRecipe from './NewRecipe';
-import MostPopularRecipe from './MostPopularRecipe';
+import TrendingRecipeCarousel from './TrendingRecipeCarousel';
+import NewRecipeCarousel from './NewRecipeCarousel';
+import MostPopularRecipe from './MostPopularRecipeCarousel';
 
 export default function RecipeSummary(): JSX.Element {
     return (
         <Stack>
             <Box height={48}></Box>
-            <TrendingRecipe></TrendingRecipe>
+            <TrendingRecipeCarousel></TrendingRecipeCarousel>
             <Box height={48}></Box>
-            <NewRecipe></NewRecipe>
+            <NewRecipeCarousel></NewRecipeCarousel>
             <Box height={48}></Box>
             <MostPopularRecipe></MostPopularRecipe>
             <Box height={48}></Box>

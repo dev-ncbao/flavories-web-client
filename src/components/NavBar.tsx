@@ -23,7 +23,7 @@ import { matchPath, useLocation, useNavigate } from 'react-router';
 import { userService } from '../services/user/user.service';
 import type { UserDto } from '../services/user/user.dto';
 
-const routes = ['/', '/recipe', '/community'];
+const routes = ['/', '/recipe/summary', '/community'];
 
 export default function NavBar(): JSX.Element {
     const [index, setIndex] = useState(0);
@@ -54,7 +54,6 @@ export default function NavBar(): JSX.Element {
 
     useEffect(() => {
         const path = location.pathname;
-        console.log('Current path:', path);
         if (matchPath('/', path)) {
             setIndex(0);
         } else if (matchPath('/recipe/*', path)) {

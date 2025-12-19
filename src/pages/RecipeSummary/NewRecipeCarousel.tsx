@@ -14,7 +14,7 @@ import { recipeService } from '../../services/recipe/recipe.service';
 import { Info, List } from 'lucide-react';
 import RecipeCarousel from '../../components/RecipeCarousel';
 
-export default function NewRecipe(): JSX.Element {
+export default function NewRecipeCarousel(): JSX.Element {
     const theme = useTheme();
     const navigate = useNavigate();
 
@@ -61,13 +61,7 @@ export default function NewRecipe(): JSX.Element {
             try {
                 setLoading(true);
 
-                const response = await recipeService.getRecipes({
-                    limit: 20,
-                    sortBy: 'createdAt',
-                    sortOrder: 'DESC',
-                    startDate: startOfMonth.toISOString(),
-                    endDate: endOfMonth.toISOString()
-                });
+                const response = await recipeService.getNewestThisMonth(20);
 
                 // Add 0.5 second delay for loading state
                 await new Promise((resolve) => setTimeout(resolve, 500));
@@ -222,7 +216,12 @@ export default function NewRecipe(): JSX.Element {
                     </Alert>
                 )}
 
-                {hasRecipes && <RecipeCarousel recipes={recipes} showRank />}
+                {hasRecipes && (
+                    <RecipeCarousel
+                        recipes={recipes}
+                        showRank
+                    />
+                )}
             </Stack>
         </Stack>
     );

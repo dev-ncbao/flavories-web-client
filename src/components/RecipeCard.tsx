@@ -5,24 +5,24 @@ import {
     Box,
     Typography,
     Stack,
-    useTheme
+    useTheme,
+    Avatar,
+    Chip
 } from '@mui/joy';
 import {
-    Star,
     ThumbsUp,
     ThumbsDown,
     Eye,
-    MessageSquareText,
-    Calendar
+    Calendar,
+    MessageSquareText
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import type { RecipeDto, Recipe } from '../services/recipe/recipe.dto';
-import type { JSX } from 'react';
 
-type RecipeLike = RecipeDto | Recipe;
+import type { JSX } from 'react';
+import type { RecipeDto } from '../services/recipe/recipe.dto';
 
 interface RecipeCardProps {
-    recipe: RecipeLike;
+    recipe: RecipeDto;
     showRank?: boolean;
     rank?: number;
 }
@@ -34,22 +34,6 @@ export default function RecipeCard({
 }: RecipeCardProps): JSX.Element {
     const theme = useTheme();
     const navigate = useNavigate();
-
-    const recipeId =
-        ('recipeId' in recipe ? recipe.recipeId : undefined) ??
-        ('id' in recipe ? recipe.id : undefined);
-    const thumbnail =
-        'thumbnailUrl' in recipe
-            ? recipe.thumbnailUrl
-            : 'thumbnail' in recipe
-              ? recipe.thumbnail
-              : undefined;
-    const rating =
-        ('rating' in recipe ? recipe.rating : undefined) ??
-        ('hotRating' in recipe ? Number(recipe.hotRating) : undefined);
-    const likeCount = 'likeCount' in recipe ? recipe.likeCount : undefined;
-    const dislikeCount = 'dislikeCount' in recipe ? recipe.dislikeCount : undefined;
-    const commentCount = 'commentCount' in recipe ? recipe.commentCount : undefined;
 
     const formatDate = (date?: Date) => {
         if (!date) return 'Unknown';
@@ -64,9 +48,7 @@ export default function RecipeCard({
         <Card
             variant="outlined"
             onClick={() => {
-                if (recipeId !== undefined) {
-                    navigate(`/recipe/${recipeId}`);
-                }
+                navigate(`/recipe/${recipe.recipeId}/detail`);
             }}
             sx={{
                 height: '100%',
@@ -80,7 +62,7 @@ export default function RecipeCard({
                 }
             }}
         >
-            {thumbnail && (
+            {recipe.thumbnailUrl && (
                 <AspectRatio
                     ratio="16/9"
                     sx={{
@@ -88,8 +70,8 @@ export default function RecipeCard({
                     }}
                 >
                     <img
-                        src={thumbnail}
-                        alt={recipe.name || 'Recipe'}
+                        src={recipe.thumbnailUrl}
+                        alt={recipe.name || 'Untitled Recipe'}
                         loading="lazy"
                     />
 
@@ -163,111 +145,111 @@ export default function RecipeCard({
             )}
 
             <CardContent>
-                <Typography
-                    level="title-lg"
-                    sx={{ mb: 1 }}
-                >
-                    {recipe.name || 'Untitled Recipe'}
-                </Typography>
-
                 <Stack
                     direction="row"
-                    spacing={2}
+                    spacing={1}
                     alignItems="center"
-                    sx={{ mb: 1.5 }}
+                    justifyContent={'space-between'}
+                    sx={{ mb: 1 }}
                 >
-                    {/* Rating */}
                     <Stack
                         direction="row"
-                        spacing={0.5}
+                        spacing={1}
                         alignItems="center"
+                        justifyContent={'space-between'}
+                        flex={1}
                     >
-                        <Star
-                            size={16}
-                            fill={theme.vars.palette.yellow[400]}
-                            color={theme.vars.palette.yellow[400]}
-                        />
-                        <Typography
-                            level="body-sm"
-                            fontWeight={600}
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
                         >
-                            {rating !== undefined ? Number(rating).toFixed(1) : '0.0'}
-                        </Typography>
-                    </Stack>
-
-                    {/* Like */}
-                    <Stack
-                        direction="row"
-                        spacing={0.5}
-                        alignItems="center"
-                    >
-                        <ThumbsUp
-                            size={16}
-                            color={theme.vars.palette.green[500]}
-                        />
-                        <Typography
-                            level="body-sm"
-                            fontWeight={600}
+                            <Avatar
+                                size="sm"
+                                src={recipe.user?.avatarUrl}
+                                alt={recipe.user?.username}
+                            >
+                                {recipe.user?.username?.charAt(0).toUpperCase()}
+                            </Avatar>
+                            <Stack
+                                alignItems={'flex-start'}
+                                justifyContent={'flex-end'}
+                                spacing={-0.25}
+                            >
+                                <Typography
+                                    level="title-sm"
+                                    fontWeight={600}
+                                >
+                                    {recipe.user?.firstName}{' '}
+                                    {recipe.user?.lastName &&
+                                        ` ${recipe.user?.lastName}`}
+                                </Typography>
+                                <Typography
+                                    level="body-xs"
+                                    sx={{
+                                        color: 'var(--joy-palette-neutral-500)'
+                                    }}
+                                >
+                                    {recipe.user?.username &&
+                                        `(@${recipe.user?.username})`}
+                                </Typography>
+                            </Stack>
+                        </Stack>
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
                         >
-                            {likeCount ?? 0}
-                        </Typography>
-                    </Stack>
-
-                    {/* Dislike */}
-                    <Stack
-                        direction="row"
-                        spacing={0.5}
-                        alignItems="center"
-                    >
-                        <ThumbsDown
-                            size={16}
-                            color={theme.vars.palette.red[500]}
-                        />
-                        <Typography
-                            level="body-sm"
-                            fontWeight={600}
-                        >
-                            {dislikeCount ?? 0}
-                        </Typography>
-                    </Stack>
-
-                    {/* View Count */}
-                    <Stack
-                        direction="row"
-                        spacing={0.5}
-                        alignItems="center"
-                    >
-                        <Eye
-                            size={16}
-                            color={theme.vars.palette.blue[500]}
-                        />
-                        <Typography
-                            level="body-sm"
-                            fontWeight={600}
-                        >
-                            {recipe.viewCount || 0}
-                        </Typography>
-                    </Stack>
-
-                    {/* Comment Count */}
-                    <Stack
-                        direction="row"
-                        spacing={0.5}
-                        alignItems="center"
-                    >
-                        <MessageSquareText
-                            size={16}
-                            color={theme.vars.palette.purple[500]}
-                        />
-                        <Typography
-                            level="body-sm"
-                            fontWeight={600}
-                        >
-                            {commentCount ?? 0}
-                        </Typography>
+                            <Chip
+                                variant="soft"
+                                startDecorator={<ThumbsUp size={14} />}
+                                sx={{
+                                    borderRadius: theme.vars.radius.lg,
+                                    color: theme.vars.palette.gray[700],
+                                    backgroundColor: '#ededed'
+                                }}
+                            >
+                                {recipe.likeCount ?? 0}
+                            </Chip>
+                            <Chip
+                                variant="soft"
+                                startDecorator={<ThumbsDown size={14} />}
+                                sx={{
+                                    borderRadius: theme.vars.radius.lg,
+                                    color: theme.vars.palette.gray[700],
+                                    backgroundColor: '#ededed'
+                                }}
+                            >
+                                {recipe.dislikeCount ?? 0}
+                            </Chip>
+                            <Chip
+                                variant="soft"
+                                startDecorator={<Eye size={14} />}
+                                sx={{
+                                    borderRadius: theme.vars.radius.lg,
+                                    color: theme.vars.palette.gray[700],
+                                    backgroundColor: '#ededed'
+                                }}
+                            >
+                                {recipe.viewCount ?? 0}
+                            </Chip>
+                            <Chip
+                                variant="soft"
+                                startDecorator={<MessageSquareText size={14} />}
+                                sx={{
+                                    borderRadius: theme.vars.radius.lg,
+                                    color: theme.vars.palette.gray[700],
+                                    backgroundColor: '#ededed'
+                                }}
+                            >
+                                {recipe.commentCount ?? 0}
+                            </Chip>
+                        </Stack>
                     </Stack>
                 </Stack>
-
+                <Typography level="title-lg">
+                    {recipe.name || 'Untitled Recipe'}
+                </Typography>
                 <Typography
                     level="body-sm"
                     sx={{

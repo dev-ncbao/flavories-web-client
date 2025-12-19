@@ -4,9 +4,9 @@ import SignUp from '../pages/Authentication/SignUp';
 import Community from '../pages/Community';
 import LandingPage from '../pages/LandingPage/LandingPage';
 import NotFound from '../pages/NotFound';
-import RecipeSummary from '../pages/Recipe/RecipeSummary';
-import RecipeDiscovery from '../pages/Recipe/RecipeDiscovery';
-import RecipeDetail from '../pages/Recipe/RecipeDetail';
+import RecipeSummary from '../pages/RecipeSummary/RecipeSummary';
+import RecipeDiscovery from '../pages/RecipeSummary/RecipeDiscovery';
+import RecipeDetail from '../pages/RecipeDetail/RecipeDetail';
 
 export const appRoutes = [
     {
@@ -14,9 +14,9 @@ export const appRoutes = [
         element: <App />,
         children: [
             { index: true, element: <LandingPage /> },
-            { path: 'recipe', element: <RecipeSummary /> },
+            { path: 'recipe/summary', element: <RecipeSummary /> },
             { path: 'recipe/discovery', element: <RecipeDiscovery /> },
-            { path: 'recipe/:id', element: <RecipeDetail /> },
+            { path: 'recipe/:id/detail', element: <RecipeDetail /> },
             { path: 'community', element: <Community /> }
         ]
     },

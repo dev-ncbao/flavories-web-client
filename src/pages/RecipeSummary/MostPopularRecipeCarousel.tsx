@@ -14,7 +14,7 @@ import { recipeService } from '../../services/recipe/recipe.service';
 import { Info, List } from 'lucide-react';
 import RecipeCarousel from '../../components/RecipeCarousel';
 
-export default function MostPopularRecipe(): JSX.Element {
+export default function MostPopularRecipeCarousel(): JSX.Element {
     const theme = useTheme();
     const navigate = useNavigate();
     const [recipes, setRecipes] = useState<RecipeDto[]>([]);
@@ -40,11 +40,7 @@ export default function MostPopularRecipe(): JSX.Element {
         const fetchRecipes = async () => {
             try {
                 setLoading(true);
-                const response = await recipeService.getRecipes({
-                    limit: 20,
-                    sortBy: 'trendingScore',
-                    sortOrder: 'DESC'
-                });
+                const response = await recipeService.getHotAllTime(20);
 
                 // Add 0.5 second delay for loading state
                 await new Promise((resolve) => setTimeout(resolve, 500));
@@ -185,7 +181,12 @@ export default function MostPopularRecipe(): JSX.Element {
                     </Alert>
                 )}
 
-                {hasRecipes && <RecipeCarousel recipes={recipes} showRank />}
+                {hasRecipes && (
+                    <RecipeCarousel
+                        recipes={recipes}
+                        showRank
+                    />
+                )}
             </Stack>
         </Stack>
     );

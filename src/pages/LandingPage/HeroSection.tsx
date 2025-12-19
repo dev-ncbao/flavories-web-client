@@ -50,7 +50,7 @@ export default function HeroSection(): JSX.Element {
                         paddingX: 4,
                         borderRadius: theme.vars.radius.lg
                     }}
-                    onClick={() => navigate('/recipe/1')}
+                    onClick={() => navigate('/recipe/summary')}
                 >
                     Explore Recipes
                 </Button>

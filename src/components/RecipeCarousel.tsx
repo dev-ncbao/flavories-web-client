@@ -4,17 +4,16 @@ import { useRef, useState, type JSX } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
-import type { RecipeDto, Recipe } from '../services/recipe/recipe.dto';
 import RecipeCard from './RecipeCard';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-
-type RecipeLike = RecipeDto | Recipe;
+import type { RecipeDto } from '../services/recipe/recipe.dto';
 
 interface RecipeCarouselProps {
-    recipes: RecipeLike[];
+    recipes: RecipeDto[];
     showRank?: boolean;
+    showRating?: boolean;
 }
 
 export default function RecipeCarousel({
@@ -60,9 +59,11 @@ export default function RecipeCarousel({
                     padding: 0,
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                     transition: 'all 0.3s ease',
+                    opacity: 0.7,
                     '&:hover:not(:disabled)': {
                         transform: 'translateY(-50%) scale(1.05)',
-                        boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)'
+                        boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)',
+                        opacity: 1
                     },
                     '&:disabled': {
                         backgroundColor: theme.vars.palette.neutral[200],
@@ -95,10 +96,12 @@ export default function RecipeCarousel({
                     borderRadius: '50%',
                     padding: 0,
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                    opacity: 0.7,
                     transition: 'all 0.3s ease',
                     '&:hover:not(:disabled)': {
                         transform: 'translateY(-50%) scale(1.05)',
-                        boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)'
+                        boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)',
+                        opacity: 1
                     },
                     '&:disabled': {
                         backgroundColor: theme.vars.palette.neutral[200],
@@ -141,15 +144,7 @@ export default function RecipeCarousel({
                 }}
             >
                 {recipes.map((recipe, index) => (
-                    <SwiperSlide
-                        key={
-                            'recipeId' in recipe && recipe.recipeId !== undefined
-                                ? recipe.recipeId
-                                : 'id' in recipe && recipe.id !== undefined
-                                  ? recipe.id
-                                  : index
-                        }
-                    >
+                    <SwiperSlide key={recipe.recipeId}>
                         <RecipeCard
                             recipe={recipe}
                             showRank={showRank}
