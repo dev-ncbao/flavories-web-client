@@ -1,7 +1,15 @@
-import { Stack, IconButton, Box, useTheme } from '@mui/joy';
+import {
+    Stack,
+    IconButton,
+    Box,
+    useTheme,
+    Alert,
+    Button,
+    Typography
+} from '@mui/joy';
 import { useEffect, useState, useRef, type JSX } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Lock, ShoppingCart } from 'lucide-react';
 import { courseService } from '../../services/course/course.service';
 import type { CourseDto } from '../../services/course/course.dto';
 import { CourseHeroCard } from './CourseHeroCard';
@@ -10,15 +18,23 @@ import { CourseIngredientCard } from './CourseIngredientCard';
 import { CourseStepsCard } from './CourseStepsCard';
 import { CourseCommentsCard } from './CourseCommentsCard';
 import BackLink from '../../components/BackLink';
+import { useAuth } from '../../hooks/useAuth';
+import { useSnackbar } from '../../hooks/useSnackbar';
+import { paymentService } from '../../services/payment/payment.service';
 
 export default function CourseDetail(): JSX.Element {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const theme = useTheme();
     const commentsRef = useRef<HTMLDivElement>(null);
+    const { isLoggedIn } = useAuth();
+    const { openSnackbar } = useSnackbar();
 
     const [course, setCourse] = useState<CourseDto>({} as CourseDto);
     const [showScrollToTop, setShowScrollToTop] = useState(false);
+    const [hasPurchased, setHasPurchased] = useState(false);
+    const [isCheckingPurchase, setIsCheckingPurchase] = useState(true);
+    const [isPurchasing, setIsPurchasing] = useState(false);
 
     useEffect(() => {
         const fetchCourse = async () => {
@@ -32,6 +48,31 @@ export default function CourseDetail(): JSX.Element {
 
         fetchCourse();
     }, [id]);
+
+    useEffect(() => {
+        const checkPurchaseStatus = async () => {
+            if (!isLoggedIn || !course.courseId) {
+                setIsCheckingPurchase(false);
+                setHasPurchased(false);
+                return;
+            }
+
+            try {
+                setIsCheckingPurchase(true);
+                const response = await paymentService.getPurchaseStatus(
+                    course.courseId
+                );
+                setHasPurchased(response.data.hasPurchased);
+            } catch {
+                // If error, assume not purchased
+                setHasPurchased(false);
+            } finally {
+                setIsCheckingPurchase(false);
+            }
+        };
+
+        checkPurchaseStatus();
+    }, [isLoggedIn, course.courseId]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -67,6 +108,44 @@ export default function CourseDetail(): JSX.Element {
         });
     };
 
+    const handlePurchase = async () => {
+        if (!isLoggedIn) {
+            openSnackbar('Please sign in to purchase this course', 'warning');
+            navigate('/sign-in');
+            return;
+        }
+
+        if (!course.courseId) {
+            openSnackbar('Course information not available', 'danger');
+            return;
+        }
+
+        try {
+            setIsPurchasing(true);
+            const response = await paymentService.purchaseCourse({
+                courseId: course.courseId
+            });
+            
+            if (response.data.checkoutUrl) {
+                // Navigate to checkout URL
+                window.location.href = response.data.checkoutUrl;
+            } else {
+                openSnackbar(
+                    'Checkout URL not available. Please try again.',
+                    'danger'
+                );
+                setIsPurchasing(false);
+            }
+        } catch (err: unknown) {
+            const errorMessage =
+                (err as { response?: { data?: { message?: string } } })
+                    ?.response?.data?.message ||
+                'Failed to initiate purchase. Please try again.';
+            openSnackbar(errorMessage, 'danger');
+            setIsPurchasing(false);
+        }
+    };
+
     return (
         <Stack
             spacing={3}
@@ -77,16 +156,62 @@ export default function CourseDetail(): JSX.Element {
                 course={course}
                 onCommentClick={scrollToComments}
             />
-            {course.videoUrl && (
-                <CourseVideoCard
-                    videoUrl={course.videoUrl}
-                    courseName={course.name}
-                />
+            
+            {/* Purchase Alert - Show if not purchased */}
+            {!isCheckingPurchase && !hasPurchased && (
+                <Alert
+                    variant="soft"
+                    color="warning"
+                    startDecorator={<Lock size={20} />}
+                    sx={{
+                        borderRadius: theme.vars.radius.xl,
+                        alignItems: 'flex-start'
+                    }}
+                >
+                    <Stack spacing={2} sx={{ width: '100%' }}>
+                        <div>
+                            <Typography
+                                level="title-md"
+                                fontWeight={700}
+                                sx={{ mb: 1 }}
+                            >
+                                Purchase Required
+                            </Typography>
+                            <Typography level="body-sm">
+                                To watch the video, view ingredients, and see
+                                the cooking steps, please purchase this course.
+                            </Typography>
+                        </div>
+                        <Button
+                            onClick={handlePurchase}
+                            loading={isPurchasing}
+                            startDecorator={<ShoppingCart size={16} />}
+                            sx={{
+                                borderRadius: theme.vars.radius.md,
+                                alignSelf: 'flex-start'
+                            }}
+                        >
+                            Purchase Course
+                        </Button>
+                    </Stack>
+                </Alert>
             )}
-            <CourseIngredientCard
-                courseIngredients={course.courseIngredients || []}
-            />
-            <CourseStepsCard courseSteps={course.courseSteps || []} />
+
+            {/* Show content only if purchased */}
+            {hasPurchased && (
+                <>
+                    {course.videoUrl && (
+                        <CourseVideoCard
+                            videoUrl={course.videoUrl}
+                            courseName={course.name}
+                        />
+                    )}
+                    <CourseIngredientCard
+                        courseIngredients={course.courseIngredients || []}
+                    />
+                    <CourseStepsCard courseSteps={course.courseSteps || []} />
+                </>
+            )}
             <div ref={commentsRef}>
                 <CourseCommentsCard
                     courseComments={course.courseComments || []}
