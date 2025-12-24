@@ -3,17 +3,18 @@ import { Box, Stack } from '@mui/joy';
 import TrendingCourseCarousel from './TrendingCourseCarousel';
 import NewCourseCarousel from './NewCourseCarousel';
 import MostPopularCourseCarousel from './MostPopularCourseCarousel';
+import { SPACING } from '../../constants/ui.constants';
 
 export default function CourseSummary(): JSX.Element {
     return (
         <Stack>
-            <Box height={48}></Box>
-            <TrendingCourseCarousel></TrendingCourseCarousel>
-            <Box height={48}></Box>
-            <NewCourseCarousel></NewCourseCarousel>
-            <Box height={48}></Box>
-            <MostPopularCourseCarousel></MostPopularCourseCarousel>
-            <Box height={48}></Box>
+            <Box height={SPACING.XXL} />
+            <TrendingCourseCarousel />
+            <Box height={SPACING.XXL} />
+            <NewCourseCarousel />
+            <Box height={SPACING.XXL} />
+            <MostPopularCourseCarousel />
+            <Box height={SPACING.XXL} />
         </Stack>
     );
 }

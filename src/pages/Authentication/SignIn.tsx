@@ -1,33 +1,34 @@
 import {
-    Alert,
     Box,
     Button,
     FormControl,
     FormLabel,
-    IconButton,
     Input,
     Link,
     Stack,
     Typography,
     useTheme
 } from '@mui/joy';
-import { ChevronLeft, Eye, EyeOff, OctagonAlert, X } from 'lucide-react';
 import { useState, type JSX } from 'react';
 import { useNavigate } from 'react-router';
 import { authService } from '../../services/auth/auth.service';
 import { useAuth } from '../../hooks/useAuth';
+import { useErrorHandler } from '../../hooks/useErrorHandler';
+import PasswordInput from '../../components/PasswordInput';
+import ErrorAlert from '../../components/ErrorAlert';
+import BackLink from '../../components/BackLink';
+import { TOKEN_KEY } from '../../constants/ui.constants';
 
 export default function SignIn(): JSX.Element {
     const navigate = useNavigate();
     const theme = useTheme();
     const { refreshAuth } = useAuth();
+    const { error, showError, setError, clearError, handleApiError } =
+        useErrorHandler();
 
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-
-    const [error, setError] = useState<string | null>(null);
-    const [showError, setShowError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     return (
         <Stack
@@ -43,30 +44,15 @@ export default function SignIn(): JSX.Element {
                 alignItems={'center'}
             >
                 <Stack alignSelf={'flex-start'}>
-                    <Link
-                        startDecorator={<ChevronLeft />}
-                        variant="plain"
-                        color="success"
-                        padding={0}
-                        onClick={() => {
+                    <BackLink
+                        onBack={() => {
                             if (window.history.length > 1) {
                                 navigate(-1);
                             } else {
                                 navigate('/');
                             }
                         }}
-                        sx={{
-                            cursor: 'pointer'
-                        }}
-                    >
-                        <Typography
-                            level="body-sm"
-                            color="success"
-                            fontWeight={600}
-                        >
-                            Back
-                        </Typography>
-                    </Link>
+                    />
                 </Stack>
                 <Box height={32} />
                 <Stack>
@@ -112,120 +98,45 @@ export default function SignIn(): JSX.Element {
                         />
                     </FormControl>
                     <Box height={16} />
-                    <FormControl>
-                        <FormLabel>Password: </FormLabel>
-                        <Input
-                            endDecorator={
-                                !showPassword ? (
-                                    <Button
-                                        variant="plain"
-                                        color="neutral"
-                                        sx={{
-                                            color: 'var(--joy-palette-neutral-500)',
-                                            '&:hover': {
-                                                color: 'var(--joy-palette-neutral-600)'
-                                            }
-                                        }}
-                                        onClick={() =>
-                                            setShowPassword(!showPassword)
-                                        }
-                                    >
-                                        <Eye />
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="plain"
-                                        color="neutral"
-                                        sx={{
-                                            color: 'var(--joy-palette-neutral-500)',
-                                            '&:hover': {
-                                                color: 'var(--joy-palette-neutral-600)'
-                                            }
-                                        }}
-                                        onClick={() =>
-                                            setShowPassword(!showPassword)
-                                        }
-                                    >
-                                        <EyeOff />
-                                    </Button>
-                                )
-                            }
-                            value={password}
-                            type={!showPassword ? 'password' : 'text'}
-                            onChange={(event) =>
-                                setPassword(event.target.value)
-                            }
-                            placeholder="Enter your password"
-                            sx={{
-                                borderRadius: theme.vars.radius.md
-                            }}
-                        />
-                    </FormControl>
+                    <PasswordInput
+                        value={password}
+                        onChange={setPassword}
+                        label="Password:"
+                        placeholder="Enter your password"
+                        disabled={isLoading}
+                    />
                     <Box height={16} />
-                    {showError && (
-                        <Alert
-                            sx={{
-                                alignItems: 'flex-start',
-                                borderRadius: theme.vars.radius.lg
-                            }}
-                            startDecorator={<OctagonAlert />}
-                            variant="soft"
-                            color={'danger'}
-                            endDecorator={
-                                <IconButton
-                                    variant="soft"
-                                    color={'danger'}
-                                    onClick={() => setShowError(false)}
-                                >
-                                    <X />
-                                </IconButton>
-                            }
-                        >
-                            <div>
-                                <Typography
-                                    level="title-sm"
-                                    fontWeight={700}
-                                    sx={{
-                                        color: 'var(--joy-palette-danger-700)'
-                                    }}
-                                >
-                                    Error
-                                </Typography>
-                                <Box height={4}></Box>
-                                <Typography
-                                    level="body-xs"
-                                    sx={{
-                                        color: 'var(--joy-palette-danger-700)'
-                                    }}
-                                >
-                                    {error}
-                                </Typography>
-                            </div>
-                        </Alert>
-                    )}
+                    <ErrorAlert
+                        error={error}
+                        show={showError}
+                        onClose={clearError}
+                    />
                     <Box height={24} />
                     <Button
                         sx={{
                             borderRadius: theme.vars.radius.md
                         }}
+                        loading={isLoading}
                         onClick={async () => {
-                            await authService
-                                .signIn({ usernameOrEmail, password })
-                                .then(async ({ data }) => {
-                                    localStorage.setItem(
-                                        'token',
-                                        data.accessToken
-                                    );
-                                    await refreshAuth();
-                                    navigate('/');
-                                })
-                                .catch((err) => {
-                                    setError(
-                                        err.response?.data?.message ||
-                                            'An error occurred. Please try again.'
-                                    );
-                                    setShowError(true);
+                            if (!usernameOrEmail || !password) {
+                                setError('Please fill in all fields');
+                                return;
+                            }
+
+                            try {
+                                setIsLoading(true);
+                                const { data } = await authService.signIn({
+                                    usernameOrEmail,
+                                    password
                                 });
+                                localStorage.setItem(TOKEN_KEY, data.accessToken);
+                                await refreshAuth();
+                                navigate('/');
+                            } catch (err) {
+                                handleApiError(err);
+                            } finally {
+                                setIsLoading(false);
+                            }
                         }}
                     >
                         Sign In

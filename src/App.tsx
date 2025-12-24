@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type JSX } from 'react';
 import { Box, Stack, useTheme } from '@mui/joy';
 import NavBar from './components/NavBar';
 import { Outlet } from 'react-router';
+import { Z_INDEX, TRANSITION_DURATION } from './constants/ui.constants';
 
 export default function App(): JSX.Element {
     const theme = useTheme();
@@ -39,12 +40,12 @@ export default function App(): JSX.Element {
                     position: 'fixed',
                     top: 0,
                     backgroundColor: 'white',
-                    zIndex: 1000,
+                    zIndex: Z_INDEX.NAVBAR,
                     borderBottom: stuck
                         ? `1.5px solid ${theme.vars.palette.divider}`
                         : 'none',
                     boxShadow: stuck ? theme.vars.shadow.lg : 'none',
-                    transition: 'box-shadow 0.2s ease',
+                    transition: `box-shadow ${TRANSITION_DURATION.FAST} ease`,
                     paddingInline: 64
                 }}
             >

@@ -2,6 +2,7 @@ import axios, {
     type AxiosInstance,
     type InternalAxiosRequestConfig
 } from 'axios';
+import { TOKEN_KEY } from '../constants/ui.constants';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -15,7 +16,7 @@ const axiosClient: AxiosInstance = axios.create({
 
 axiosClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem(TOKEN_KEY);
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
         }

@@ -1,15 +1,7 @@
-import {
-    Stack,
-    IconButton,
-    Box,
-    useTheme,
-    Alert,
-    Button,
-    Typography
-} from '@mui/joy';
+import { Stack, Alert, Button, Typography, useTheme } from '@mui/joy';
 import { useEffect, useState, useRef, type JSX } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { ArrowUp, Lock, ShoppingCart } from 'lucide-react';
+import { Lock, ShoppingCart } from 'lucide-react';
 import { courseService } from '../../services/course/course.service';
 import type { CourseDto } from '../../services/course/course.dto';
 import { CourseHeroCard } from './CourseHeroCard';
@@ -18,9 +10,13 @@ import { CourseIngredientCard } from './CourseIngredientCard';
 import { CourseStepsCard } from './CourseStepsCard';
 import { CourseCommentsCard } from './CourseCommentsCard';
 import BackLink from '../../components/BackLink';
+import ScrollToTopButton from '../../components/ScrollToTopButton';
 import { useAuth } from '../../hooks/useAuth';
 import { useSnackbar } from '../../hooks/useSnackbar';
+import { useScrollToTop } from '../../hooks/useScrollToTop';
+import { useAsyncData } from '../../hooks/useAsyncData';
 import { paymentService } from '../../services/payment/payment.service';
+import { scrollToElement } from '../../utils/scrollUtils';
 
 export default function CourseDetail(): JSX.Element {
     const navigate = useNavigate();
@@ -29,29 +25,20 @@ export default function CourseDetail(): JSX.Element {
     const commentsRef = useRef<HTMLDivElement>(null);
     const { isLoggedIn } = useAuth();
     const { openSnackbar } = useSnackbar();
+    const showScrollToTop = useScrollToTop();
 
-    const [course, setCourse] = useState<CourseDto>({} as CourseDto);
-    const [showScrollToTop, setShowScrollToTop] = useState(false);
+    const { data: course, refetch } = useAsyncData<CourseDto>({
+        fetchFn: () => courseService.getCourseById(Number(id)),
+        dependencies: [id]
+    });
+
     const [hasPurchased, setHasPurchased] = useState(false);
     const [isCheckingPurchase, setIsCheckingPurchase] = useState(true);
     const [isPurchasing, setIsPurchasing] = useState(false);
 
     useEffect(() => {
-        const fetchCourse = async () => {
-            try {
-                const response = await courseService.getCourseById(Number(id));
-                setCourse(response.data);
-            } catch {
-                // Error handling
-            }
-        };
-
-        fetchCourse();
-    }, [id]);
-
-    useEffect(() => {
         const checkPurchaseStatus = async () => {
-            if (!isLoggedIn || !course.courseId) {
+            if (!isLoggedIn || !course?.courseId) {
                 setIsCheckingPurchase(false);
                 setHasPurchased(false);
                 return;
@@ -72,40 +59,14 @@ export default function CourseDetail(): JSX.Element {
         };
 
         checkPurchaseStatus();
-    }, [isLoggedIn, course.courseId]);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const scrollY =
-                window.scrollY || document.documentElement.scrollTop;
-            setShowScrollToTop(scrollY > 300);
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [isLoggedIn, course?.courseId]);
 
     const handleCommentAdded = async () => {
-        try {
-            const response = await courseService.getCourseById(Number(id));
-            setCourse(response.data);
-        } catch {
-            // Error handling
-        }
+        await refetch();
     };
 
     const scrollToComments = () => {
-        commentsRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-    };
-
-    const scrollToTop = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+        scrollToElement(commentsRef.current);
     };
 
     const handlePurchase = async () => {
@@ -115,7 +76,7 @@ export default function CourseDetail(): JSX.Element {
             return;
         }
 
-        if (!course.courseId) {
+        if (!course?.courseId) {
             openSnackbar('Course information not available', 'danger');
             return;
         }
@@ -123,7 +84,7 @@ export default function CourseDetail(): JSX.Element {
         try {
             setIsPurchasing(true);
             const response = await paymentService.purchaseCourse({
-                courseId: course.courseId
+                courseId: course?.courseId || 0
             });
             
             if (response.data.checkoutUrl) {
@@ -145,6 +106,10 @@ export default function CourseDetail(): JSX.Element {
             setIsPurchasing(false);
         }
     };
+
+    if (!course) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <Stack
@@ -219,41 +184,7 @@ export default function CourseDetail(): JSX.Element {
                     onCommentAdded={handleCommentAdded}
                 />
             </div>
-
-            {/* Scroll to Top Button */}
-            {showScrollToTop && (
-                <Box
-                    sx={{
-                        position: 'fixed',
-                        bottom: { xs: 24, md: 32 },
-                        right: { xs: 24, md: 32 },
-                        zIndex: 1000
-                    }}
-                >
-                    <IconButton
-                        onClick={scrollToTop}
-                        size="lg"
-                        sx={{
-                            borderRadius: theme.vars.radius.xl,
-                            bgcolor: 'primary.500',
-                            color: 'white',
-                            boxShadow: theme.vars.shadow.lg,
-                            width: { xs: 48, md: 56 },
-                            height: { xs: 48, md: 56 },
-                            '&:hover': {
-                                color: 'white',
-                                bgcolor: 'primary.600',
-                                boxShadow: theme.vars.shadow.xl,
-                                transform: 'translateY(-2px)'
-                            },
-                            transition: 'all 0.3s ease'
-                        }}
-                        aria-label="Scroll to top"
-                    >
-                        <ArrowUp size={24} />
-                    </IconButton>
-                </Box>
-            )}
+            <ScrollToTopButton show={showScrollToTop} />
         </Stack>
     );
 }

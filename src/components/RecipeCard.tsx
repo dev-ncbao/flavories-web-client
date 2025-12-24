@@ -17,6 +17,8 @@ import {
     MessageSquareText
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { formatDate } from '../utils/dateUtils';
+import { CARD_BORDER_RADIUS, TRANSITION_DURATION } from '../constants/ui.constants';
 
 import type { JSX } from 'react';
 import type { RecipeDto } from '../services/recipe/recipe.dto';
@@ -35,26 +37,19 @@ export default function RecipeCard({
     const theme = useTheme();
     const navigate = useNavigate();
 
-    const formatDate = (date?: Date) => {
-        if (!date) return 'Unknown';
-        return new Date(date).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
+    const handleCardClick = () => {
+        navigate(`/recipe/${recipe.recipeId}/detail`);
     };
 
     return (
         <Card
             variant="outlined"
-            onClick={() => {
-                navigate(`/recipe/${recipe.recipeId}/detail`);
-            }}
+            onClick={handleCardClick}
             sx={{
                 height: '100%',
                 cursor: 'pointer',
-                borderRadius: 24,
-                transition: 'all 0.3s ease',
+                borderRadius: CARD_BORDER_RADIUS,
+                transition: `all ${TRANSITION_DURATION.NORMAL} ease`,
                 '&:hover': {
                     borderColor: theme.vars.palette.primary[500],
                     boxShadow: `0 4px 20px rgba(${theme.vars.palette.primary.mainChannel} / 0.2)`,
