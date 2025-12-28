@@ -7,4 +7,5 @@ export class UserDto {
     gender?: number;
     avatarUrl?: string;
     bio?: string;
+    roleId?: number;
 }

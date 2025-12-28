@@ -2,7 +2,8 @@ import axiosClient from '../../api/axiosClient';
 import type {
     CourseDto,
     CourseQueryParams,
-    PostCourseCommentRequest
+    PostCourseCommentRequest,
+    CreateCourseRequest
 } from './course.dto';
 
 export const courseService = {
@@ -40,6 +41,18 @@ export const courseService = {
             '/courses-comments',
             data
         );
+    },
+    // Create a new course
+    createCourse: (data: CreateCourseRequest) => {
+        return axiosClient.post<CourseDto>('/courses', data);
+    },
+    // Get user's courses
+    getUserCourses: () => {
+        return axiosClient.get<CourseDto[]>('/users/Courses');
+    },
+    // Delete course by ID
+    deleteCourse: (id: number) => {
+        return axiosClient.delete(`/courses/${id}`);
     }
 };
 

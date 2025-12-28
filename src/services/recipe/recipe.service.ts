@@ -1,5 +1,9 @@
 import axiosClient from '../../api/axiosClient';
-import type { PostCommentRequest, RecipeDto } from './recipe.dto';
+import type {
+    CreateRecipeRequest,
+    PostCommentRequest,
+    RecipeDto
+} from './recipe.dto';
 
 export interface RecipeQueryParams {
     limit?: number;
@@ -50,5 +54,16 @@ export const recipeService = {
     },
     postComment: (data: PostCommentRequest) => {
         return axiosClient.post<PostCommentRequest>('/recipe-comments', data);
+    },
+    createRecipe: (data: CreateRecipeRequest) => {
+        return axiosClient.post<RecipeDto>('/recipes', data);
+    },
+    // Get user's recipes
+    getUserRecipes: () => {
+        return axiosClient.get<RecipeDto[]>('/users/recipes');
+    },
+    // Delete recipe by ID
+    deleteRecipe: (id: number) => {
+        return axiosClient.delete(`/recipes/${id}`);
     }
 };

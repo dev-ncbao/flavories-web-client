@@ -120,6 +120,9 @@ export default function CourseDetail(): JSX.Element {
             <CourseHeroCard
                 course={course}
                 onCommentClick={scrollToComments}
+                onPurchase={handlePurchase}
+                isPurchasing={isPurchasing}
+                hasPurchased={hasPurchased}
             />
             
             {/* Purchase Alert - Show if not purchased */}

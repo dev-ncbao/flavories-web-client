@@ -42,3 +42,23 @@ export interface PostCommentRequest {
     userId: number;
     comment: string;
 }
+
+export interface CreateRecipeRequest {
+    userId: number;
+    name: string;
+    description: string;
+    thumbnailUrl: string;
+    ingredients: {
+        ingredientId: number;
+        amount: number;
+        ingredientName: string;
+        unit: {
+            unitId: number;
+            abbreviation: string;
+        }
+    }[];
+    steps: {
+        stepNumber: number;
+        description: string;
+    }[];
+}

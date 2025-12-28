@@ -4,6 +4,7 @@ import {
     Box,
     Button,
     Dropdown,
+    IconButton,
     ListDivider,
     ListItemDecorator,
     Menu,
@@ -17,7 +18,17 @@ import {
     Typography,
     useTheme
 } from '@mui/joy';
-import { ChevronDown, CircleUser, LogOut, Search } from 'lucide-react';
+import {
+    ChevronDown,
+    CircleUser,
+    LogOut,
+    Search,
+    BookOpen,
+    ChefHat,
+    List,
+    Book,
+    Upload
+} from 'lucide-react';
 import { useCallback, useEffect, useState, type JSX } from 'react';
 import { matchPath, useLocation, useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
@@ -31,6 +42,9 @@ export default function NavBar(): JSX.Element {
     const location = useLocation();
     const theme = useTheme();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [searchValue, setSearchValue] = useState<string>('');
+    const [imageName, setImageName] = useState<string>('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const onTapChange = useCallback(
         (
@@ -142,18 +156,89 @@ export default function NavBar(): JSX.Element {
                     width={12}
                     height={0}
                 />
-                <Autocomplete
-                    freeSolo
-                    placeholder="Search..."
-                    options={[]}
-                    startDecorator={<Search />}
-                    sx={{
-                        width: 300,
-                        height: 44,
-                        borderRadius: theme.vars.radius.lg,
-                        backgroundColor: 'transparent'
-                    }}
-                />
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={1}
+                >
+                    <Autocomplete
+                        freeSolo
+                        placeholder="Search..."
+                        options={[]}
+                        value={searchValue}
+                        onInputChange={(_, value) => {
+                            setSearchValue(value);
+                        }}
+                        startDecorator={<Search />}
+                        sx={{
+                            width: 300,
+                            height: 44,
+                            borderRadius: theme.vars.radius.lg,
+                            backgroundColor: 'transparent'
+                        }}
+                    />
+                    {selectedFile ? (
+                        <Stack
+                            direction="row"
+                            alignItems="center"
+                            spacing={1}
+                        >
+                            <Typography
+                                level="body-sm"
+                                sx={{
+                                    maxWidth: 150,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {imageName}
+                            </Typography>
+                            <IconButton
+                                variant="soft"
+                                size="lg"
+                                onClick={() => {
+                                    // Handle search with image here
+                                    console.log('Search with image:', selectedFile);
+                                }}
+                                sx={{
+                                    height: 44,
+                                    width: 44,
+                                    borderRadius: theme.vars.radius.lg
+                                }}
+                            >
+                                <Search size={20} />
+                            </IconButton>
+                        </Stack>
+                    ) : (
+                        <IconButton
+                            component="label"
+                            variant="soft"
+                            size="lg"
+                            sx={{
+                                height: 44,
+                                width: 44,
+                                borderRadius: theme.vars.radius.lg
+                            }}
+                        >
+                            <Upload size={20} />
+                            <input
+                                type="file"
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setImageName(file.name);
+                                        setSelectedFile(file);
+                                        // Handle file upload here
+                                        console.log('File selected:', file);
+                                    }
+                                }}
+                            />
+                        </IconButton>
+                    )}
+                </Stack>
             </Stack>
             <Stack
                 direction={'row'}
@@ -216,6 +301,52 @@ export default function NavBar(): JSX.Element {
                                 </ListItemDecorator>{' '}
                                 Profile
                             </MenuItem>
+                            {user?.roleId === 1 && (
+                                <>
+                                    <ListDivider />
+                                    <MenuItem
+                                        onClick={() => {
+                                            navigate('/recipe/my-recipes');
+                                        }}
+                                    >
+                                        <ListItemDecorator>
+                                            <List />
+                                        </ListItemDecorator>{' '}
+                                        My Recipes
+                                    </MenuItem>
+                                    <MenuItem
+                                        onClick={() => {
+                                            navigate('/course/my-courses');
+                                        }}
+                                    >
+                                        <ListItemDecorator>
+                                            <Book />
+                                        </ListItemDecorator>{' '}
+                                        My Courses
+                                    </MenuItem>
+                                    <ListDivider />
+                                    <MenuItem
+                                        onClick={() => {
+                                            navigate('/recipe/create');
+                                        }}
+                                    >
+                                        <ListItemDecorator>
+                                            <ChefHat />
+                                        </ListItemDecorator>{' '}
+                                        Add Recipe
+                                    </MenuItem>
+                                    <MenuItem
+                                        onClick={() => {
+                                            navigate('/course/create');
+                                        }}
+                                    >
+                                        <ListItemDecorator>
+                                            <BookOpen />
+                                        </ListItemDecorator>{' '}
+                                        Add Course
+                                    </MenuItem>
+                                </>
+                            )}
                             <ListDivider />
                             <MenuItem
                                 color="danger"

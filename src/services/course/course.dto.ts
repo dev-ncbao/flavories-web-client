@@ -52,3 +52,25 @@ export interface CourseQueryParams {
     sortOrder?: 'ASC' | 'DESC';
 }
 
+export interface CreateCourseRequest {
+    userId: number;
+    name: string;
+    description: string;
+    thumbnailUrl: string;
+    videoUrl: string;
+    price: number;
+    ingredients: {
+        ingredientId: number;
+        amount: number;
+        ingredientName: string;
+        unit: {
+            unitId: number;
+            abbreviation: string;
+        };
+    }[];
+    steps: {
+        stepNumber: number;
+        description: string;
+    }[];
+}
+

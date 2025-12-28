@@ -4,21 +4,12 @@ import {
     Stack,
     AspectRatio,
     Typography,
-    Chip,
     Button,
     useTheme,
     Avatar,
     Box
 } from '@mui/joy';
-import {
-    Calendar,
-    Eye,
-    MessageSquareText,
-    Star,
-    DollarSign,
-    ShoppingCart,
-    Dot
-} from 'lucide-react';
+import { Dot } from 'lucide-react';
 import { type JSX } from 'react';
 import type { CourseDto } from '../../services/course/course.dto';
 import { formatDate } from '../../utils/dateUtils';
@@ -26,6 +17,7 @@ import { TRANSITION_DURATION } from '../../constants/ui.constants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faCalendar,
+    faCartShopping,
     faEye,
     faMessage,
     faStar
@@ -33,10 +25,16 @@ import {
 
 export function CourseHeroCard({
     course,
-    onCommentClick
+    onCommentClick,
+    onPurchase,
+    isPurchasing,
+    hasPurchased
 }: {
     course: CourseDto;
     onCommentClick?: () => void;
+    onPurchase?: () => void;
+    isPurchasing?: boolean;
+    hasPurchased?: boolean;
 }): JSX.Element {
     const theme = useTheme();
 
@@ -74,6 +72,7 @@ export function CourseHeroCard({
                                 overflow: 'hidden',
                                 height: '100%',
                                 maxHeight: '400px',
+                                width: '100%',
                                 '& img': {
                                     objectFit: 'cover',
                                     width: '100%',
@@ -209,31 +208,34 @@ export function CourseHeroCard({
                                 {course.commentCount} comments
                             </Typography>
                         </Stack>
-                        <Stack
-                            spacing={2}
-                            paddingY={2}
-                        >
-                            <Typography
-                                level="h3"
-                                sx={{
-                                    fontWeight: 700,
-                                    color: theme.vars.palette.danger[600]
-                                }}
+                        {!hasPurchased && (
+                            <Stack
+                                spacing={2}
+                                paddingY={2}
                             >
-                                {`${course.price.toLocaleString('vi-VN')} VND`}
-                            </Typography>
-                            <Button
-                                // onClick={handlePurchase}
-                                // loading={isPurchasing}
-                                startDecorator={<ShoppingCart size={16} />}
-                                sx={{
-                                    borderRadius: theme.vars.radius.md,
-                                    alignSelf: 'flex-start'
-                                }}
-                            >
-                                Purchase Course
-                            </Button>
-                        </Stack>
+                                <Typography
+                                    level="h3"
+                                    sx={{
+                                        fontWeight: 700,
+                                        color: theme.vars.palette.danger[600]
+                                    }}
+                                >
+                                    {`${course.price.toLocaleString('vi-VN')} VND`}
+                                </Typography>
+                                <Button
+                                    onClick={onPurchase}
+                                    loading={isPurchasing}
+                                    startDecorator={
+                                        <FontAwesomeIcon icon={faCartShopping} />
+                                    }
+                                    sx={{
+                                        borderRadius: theme.vars.radius.md
+                                    }}
+                                >
+                                    Purchase Course
+                                </Button>
+                            </Stack>
+                        )}
                         <AuthorSummary
                             avatarUrl={course.user?.avatarUrl}
                             username={course.user?.username}
